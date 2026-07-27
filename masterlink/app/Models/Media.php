@@ -10,51 +10,81 @@ class Media extends Model
 {
     use HasFactory, SoftDeletes;
 
+
     protected $fillable = [
+
         'admin_id',
+
         'file_name',
+
         'file_path',
-        'file_type',
+
+        'extension',
+
+        'media_type',
+
         'mime_type',
-        'alt_text',
+
         'file_size',
+
+        'width',
+
+        'height',
+
+        'alt_text',
+
     ];
 
+
     /**
-     * المدير الذي رفع الملف
+     * المدير الذي قام برفع الملف
      */
     public function admin()
     {
         return $this->belongsTo(Admin::class);
     }
 
+
     /**
-     * المقالات التي تستخدم هذه الصورة
+     * المقالات التي تستخدم هذا الملف
      */
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
 
+
     /**
-     * المشاريع المرتبطة بهذه الصورة
+     * المشاريع المرتبطة بهذا الملف
      */
     public function projects()
     {
         return $this->belongsToMany(
             Project::class,
             'project_media'
-        )->withTimestamps();
+        )
+        ->withTimestamps();
     }
 
+
     /**
-     * الخدمات المرتبطة بهذه الصورة
+     * الخدمات المرتبطة بهذا الملف
      */
     public function services()
     {
         return $this->belongsToMany(
             Service::class,
             'service_media'
-        )->withTimestamps();
+        )
+        ->withTimestamps();
+    }
+
+
+    /**
+     * شعار العميل المرتبط بهذا الملف
+     */
+    public function clientLogo()
+    {
+        return $this->hasOne(ClientLogo::class);
     }
 }
