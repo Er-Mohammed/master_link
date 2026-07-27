@@ -14,7 +14,7 @@ use App\Models\Consultation;
 use App\Models\ClientLogo;
 use App\Models\SiteSetting;
 use App\Models\ProjectMedia;
-
+use App\Models\Testimonial;
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -183,7 +183,24 @@ class DatabaseSeeder extends Seeder
 
             });
 
+/*
+|--------------------------------------------------------------------------
+| Testimonials
+|--------------------------------------------------------------------------
+*/
 
+Media::inRandomOrder()
+    ->take(6)
+    ->get()
+    ->each(function ($media) {
+
+        Testimonial::factory()->create([
+
+            'media_id' => $media->id,
+
+        ]);
+
+    });
 
         /*
         |--------------------------------------------------------------------------

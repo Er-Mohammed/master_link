@@ -66,7 +66,13 @@ class Media extends Model
         ->withTimestamps();
     }
 
-
+/**
+ * شهادات العملاء
+ */
+public function testimonials()
+{
+    return $this->hasMany(Testimonial::class);
+}
     /**
      * الخدمات المرتبطة بهذا الملف
      */
