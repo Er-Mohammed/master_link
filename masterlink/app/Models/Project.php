@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
+  
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -56,4 +57,6 @@ class Project extends Model
             'project_services'
         )->withTimestamps();
     }
+    
+    
 }
