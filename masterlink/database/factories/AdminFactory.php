@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,7 +18,12 @@ class AdminFactory extends Factory
 
             'password' => Hash::make('password'),
 
-            'role' => 'admin',
+            'role' => fake()->randomElement([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_CONTENT_MANAGER,
+                Admin::ROLE_MARKETING,
+            ]),
 
             'is_active' => true,
 

@@ -22,6 +22,11 @@ class Post extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'published_at' => 'datetime',
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
+    ];
 
     /**
      * الكاتب الذي أنشأ المقال
@@ -30,7 +35,6 @@ class Post extends Model
     {
         return $this->belongsTo(Admin::class);
     }
-
 
     /**
      * الصورة الرئيسية للمقال

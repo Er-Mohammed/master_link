@@ -18,6 +18,10 @@ class ProjectCategory extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     /**
      * المشاريع التابعة للتصنيف
      */

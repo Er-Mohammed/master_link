@@ -18,6 +18,10 @@ class Testimonial extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     /**
      * الصورة أو الشعار المرتبط بالشهادة
      */

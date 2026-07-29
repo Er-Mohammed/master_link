@@ -22,8 +22,12 @@ return new class extends Migration
 
             $table->string('password', 255);
 
-            $table->string('role', 50)
-                ->default('admin');
+            $table->enum('role', [
+                'super_admin',
+                'admin',
+                'content_manager',
+                'marketing',
+            ])->default('admin');
 
             $table->boolean('is_active')
                 ->default(true);
