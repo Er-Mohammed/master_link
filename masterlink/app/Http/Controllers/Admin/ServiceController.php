@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\StoreServiceRequest;
+use App\Http\Requests\Admin\UpdateServiceRequest;
 
 class ServiceController extends Controller
 {
@@ -27,26 +28,11 @@ class ServiceController extends Controller
     /**
      * Store a newly created service.
      */
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        $validated = $request->validate([
-
-            'title' => 'required|string|max:255',
-
-            'slug' => 'required|string|max:255|unique:services,slug',
-
-            'short_description' => 'nullable|string',
-
-            'full_description' => 'nullable|string',
-
-            'sort_order' => 'nullable|integer',
-
-            'is_active' => 'boolean',
-
-        ]);
-
-
-        $service = Service::create($validated);
+        $service = Service::create(
+            $request->validated()
+        );
 
 
         return response()->json([
@@ -75,26 +61,11 @@ class ServiceController extends Controller
     /**
      * Update service.
      */
-    public function update(Request $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
-        $validated = $request->validate([
-
-            'title' => 'sometimes|string|max:255',
-
-            'slug' => 'sometimes|string|max:255|unique:services,slug,' . $service->id,
-
-            'short_description' => 'nullable|string',
-
-            'full_description' => 'nullable|string',
-
-            'sort_order' => 'nullable|integer',
-
-            'is_active' => 'boolean',
-
-        ]);
-
-
-        $service->update($validated);
+        $service->update(
+            $request->validated()
+        );
 
 
         return response()->json([
