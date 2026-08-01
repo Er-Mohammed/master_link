@@ -24,6 +24,11 @@ class Project extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'completion_date' => 'date',
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
+    ];
 
     /**
      * تصنيف المشروع
@@ -33,7 +38,6 @@ class Project extends Model
         return $this->belongsTo(ProjectCategory::class);
     }
 
-
     /**
      * صور المشروع
      */
@@ -42,9 +46,10 @@ class Project extends Model
         return $this->belongsToMany(
             Media::class,
             'project_media'
-        )->withTimestamps();
+        )
+        ->withPivot('sort_order')
+        ->withTimestamps();
     }
-
 
     /**
      * الخدمات المستخدمة في المشروع

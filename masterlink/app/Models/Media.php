@@ -10,7 +10,6 @@ class Media extends Model
 {
     use HasFactory, SoftDeletes;
 
-
     protected $fillable = [
 
         'admin_id',
@@ -35,7 +34,6 @@ class Media extends Model
 
     ];
 
-
     /**
      * المدير الذي قام برفع الملف
      */
@@ -44,7 +42,6 @@ class Media extends Model
         return $this->belongsTo(Admin::class);
     }
 
-
     /**
      * المقالات التي تستخدم هذا الملف
      */
@@ -52,7 +49,6 @@ class Media extends Model
     {
         return $this->hasMany(Post::class);
     }
-
 
     /**
      * المشاريع المرتبطة بهذا الملف
@@ -63,16 +59,10 @@ class Media extends Model
             Project::class,
             'project_media'
         )
+        ->withPivot('sort_order')
         ->withTimestamps();
     }
 
-/**
- * شهادات العملاء
- */
-public function testimonials()
-{
-    return $this->hasMany(Testimonial::class);
-}
     /**
      * الخدمات المرتبطة بهذا الملف
      */
@@ -82,9 +72,17 @@ public function testimonials()
             Service::class,
             'service_media'
         )
+        ->withPivot('sort_order')
         ->withTimestamps();
     }
 
+    /**
+     * شهادات العملاء
+     */
+    public function testimonials()
+    {
+        return $this->hasMany(Testimonial::class);
+    }
 
     /**
      * شعار العميل المرتبط بهذا الملف

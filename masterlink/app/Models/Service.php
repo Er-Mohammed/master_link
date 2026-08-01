@@ -19,6 +19,10 @@ class Service extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     /**
      * صور الخدمة
      */
@@ -27,7 +31,9 @@ class Service extends Model
         return $this->belongsToMany(
             Media::class,
             'service_media'
-        )->withTimestamps();
+        )
+        ->withPivot('sort_order')
+        ->withTimestamps();
     }
 
     /**
