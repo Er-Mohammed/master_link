@@ -91,4 +91,10 @@ class Media extends Model
     {
         return $this->hasOne(ClientLogo::class);
     }
+
+    protected $casts = [
+    'file_size' => 'integer',
+    'width' => 'integer',
+    'height' => 'integer',
+];
 }

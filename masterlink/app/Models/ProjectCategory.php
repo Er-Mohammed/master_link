@@ -25,8 +25,11 @@ class ProjectCategory extends Model
     /**
      * المشاريع التابعة للتصنيف
      */
-    public function projects()
-    {
-        return $this->hasMany(Project::class);
-    }
+ public function projects()
+{
+    return $this->hasMany(
+        Project::class,
+        'category_id'
+    );
+}
 }
