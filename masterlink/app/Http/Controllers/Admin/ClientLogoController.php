@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreClientLogoRequest;
+use App\Http\Requests\Admin\UpdateClientLogoRequest;
 use App\Models\ClientLogo;
-use Illuminate\Http\Request;
 
 class ClientLogoController extends Controller
 {
     /**
-     * عرض جميع شعارات العملاء
+     * Display a listing of client logos.
      */
     public function index()
     {
@@ -19,127 +20,65 @@ class ClientLogoController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $logos
+            'data' => $logos,
         ]);
     }
 
-
     /**
-     * إنشاء شعار عميل جديد
+     * Store a newly created client logo.
      */
-    public function store(Request $request)
+    public function store(StoreClientLogoRequest $request)
     {
-        $validated = $request->validate([
-
-            'media_id' => [
-                'required',
-                'exists:media,id'
-            ],
-
-            'company_name' => [
-                'required',
-                'string',
-                'max:150'
-            ],
-
-            'website_url' => [
-                'nullable',
-                'url'
-            ],
-
-            'sort_order' => [
-                'nullable',
-                'integer'
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean'
-            ],
-        ]);
-
-
-        $logo = ClientLogo::create($validated);
-
+        $logo = ClientLogo::create(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Client logo created successfully',
-            'data' => $logo->load('media')
+            'message' => 'Client logo created successfully.',
+            'data' => $logo->load('media'),
         ], 201);
     }
 
-
     /**
-     * عرض شعار محدد
+     * Display the specified client logo.
      */
     public function show(ClientLogo $clientLogo)
     {
         return response()->json([
             'success' => true,
-            'data' => $clientLogo->load('media')
+            'data' => $clientLogo->load('media'),
         ]);
     }
 
-
     /**
-     * تحديث شعار
+     * Update the specified client logo.
      */
-    public function update(Request $request, ClientLogo $clientLogo)
-    {
-        $validated = $request->validate([
-
-            'media_id' => [
-                'nullable',
-                'exists:media,id'
-            ],
-
-            'company_name' => [
-                'nullable',
-                'string',
-                'max:150'
-            ],
-
-            'website_url' => [
-                'nullable',
-                'url'
-            ],
-
-            'sort_order' => [
-                'nullable',
-                'integer'
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean'
-            ],
-
-        ]);
-
-
-        $clientLogo->update($validated);
-
+    public function update(
+        UpdateClientLogoRequest $request,
+        ClientLogo $clientLogo
+    ) {
+        $clientLogo->update(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Client logo updated successfully',
-            'data' => $clientLogo->load('media')
+            'message' => 'Client logo updated successfully.',
+            'data' => $clientLogo->fresh()->load('media'),
         ]);
     }
 
-
     /**
-     * حذف شعار
+     * Remove the specified client logo.
      */
     public function destroy(ClientLogo $clientLogo)
     {
         $clientLogo->delete();
 
-
         return response()->json([
             'success' => true,
-            'message' => 'Client logo deleted successfully'
+            'message' => 'Client logo deleted successfully.',
         ]);
     }
 }

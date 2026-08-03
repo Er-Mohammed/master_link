@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreProjectRequest;
+use App\Http\Requests\Admin\UpdateProjectRequest;
 use App\Models\Project;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -27,23 +27,11 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource.
      */
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $validated = $request->validate([
-            'category_id' => ['required', 'exists:project_categories,id'],
-            'title' => ['required', 'string', 'max:200'],
-            'slug' => ['required', 'string', 'max:220', 'unique:projects,slug'],
-            'client_name' => ['nullable', 'string', 'max:150'],
-            'short_description' => ['nullable', 'string'],
-            'full_description' => ['nullable', 'string'],
-            'project_url' => ['nullable', 'url'],
-            'completion_date' => ['nullable', 'date'],
-            'is_featured' => ['boolean'],
-            'sort_order' => ['integer'],
-            'is_active' => ['boolean'],
-        ]);
-
-        $project = Project::create($validated);
+        $project = Project::create(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
@@ -57,9 +45,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load([
-            'category',
-        ]);
+        $project->load('category');
 
         return response()->json([
             'success' => true,
@@ -70,28 +56,11 @@ class ProjectController extends Controller
     /**
      * Update the specified resource.
      */
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-        $validated = $request->validate([
-            'category_id' => ['sometimes', 'exists:project_categories,id'],
-            'title' => ['sometimes', 'string', 'max:200'],
-            'slug' => [
-                'sometimes',
-                'string',
-                'max:220',
-                Rule::unique('projects', 'slug')->ignore($project->id),
-            ],
-            'client_name' => ['nullable', 'string', 'max:150'],
-            'short_description' => ['nullable', 'string'],
-            'full_description' => ['nullable', 'string'],
-            'project_url' => ['nullable', 'url'],
-            'completion_date' => ['nullable', 'date'],
-            'is_featured' => ['boolean'],
-            'sort_order' => ['integer'],
-            'is_active' => ['boolean'],
-        ]);
-
-        $project->update($validated);
+        $project->update(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,

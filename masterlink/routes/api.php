@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Admin Controllers
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\PostController;
@@ -13,37 +14,167 @@ use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
 use App\Http\Controllers\Admin\AdminController;
 
+
 Route::prefix('admin')->group(function () {
 
-    Route::apiResource('services', ServiceController::class);
 
-    Route::apiResource('projects', ProjectController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | Services Media Management
+    |--------------------------------------------------------------------------
+    */
 
-    Route::apiResource('posts', PostController::class);
-
-    Route::apiResource('media', MediaController::class);
-
-    Route::apiResource('client-logos', ClientLogoController::class);
-
-    Route::apiResource('testimonials', TestimonialController::class);
-
-
-    Route::apiResource('consultations', ConsultationController::class)
-        ->only([
-            'index',
-            'show',
-            'update',
-            'destroy'
-        ]);
+    Route::post(
+        'services/{service}/media',
+        [ServiceController::class, 'attachMedia']
+    )
+    ->name('services.media.attach');
 
 
-    Route::apiResource('site-settings', SiteSettingController::class);
+    Route::delete(
+        'services/{service}/media/{media}',
+        [ServiceController::class, 'detachMedia']
+    )
+    ->name('services.media.detach');
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Services
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'services',
+        ServiceController::class
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Projects
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'projects',
+        ProjectController::class
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Project Categories
+    |--------------------------------------------------------------------------
+    */
 
     Route::apiResource(
         'project-categories',
         ProjectCategoryController::class
     );
 
-    Route::apiResource('admins', AdminController::class);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Posts
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'posts',
+        PostController::class
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Media Files
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'media',
+        MediaController::class
+    )
+    ->parameters([
+        'media' => 'media'
+    ]);
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Client Logos
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'client-logos',
+        ClientLogoController::class
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Testimonials
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'testimonials',
+        TestimonialController::class
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Consultations
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'consultations',
+        ConsultationController::class
+    )
+    ->only([
+        'index',
+        'show',
+        'update',
+        'destroy'
+    ]);
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Website Settings
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'site-settings',
+        SiteSettingController::class
+    );
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource(
+        'admins',
+        AdminController::class
+    );
+
 
 });

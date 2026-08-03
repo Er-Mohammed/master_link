@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateConsultationRequest;
 use App\Models\Consultation;
-use Illuminate\Http\Request;
 
 class ConsultationController extends Controller
 {
     /**
-     * عرض جميع طلبات الاستشارة
+     * Display all consultations.
      */
     public function index()
     {
@@ -19,61 +19,49 @@ class ConsultationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $consultations
+            'data' => $consultations,
         ]);
     }
 
-
     /**
-     * عرض طلب استشارة واحد
+     * Display one consultation.
      */
     public function show(Consultation $consultation)
     {
         return response()->json([
             'success' => true,
-            'data' => $consultation->load('service')
+            'data' => $consultation->load('service'),
         ]);
     }
 
-
     /**
-     * تحديث حالة الطلب
+     * Update consultation status.
      */
-    public function update(Request $request, Consultation $consultation)
-    {
-        $validated = $request->validate([
-
-            'status' => [
-                'required',
-                'string',
-                'max:50'
-            ],
-
-        ]);
-
-
-        $consultation->update($validated);
-
+    public function update(
+        UpdateConsultationRequest $request,
+        Consultation $consultation
+    ) {
+        $consultation->update(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Consultation status updated successfully',
-            'data' => $consultation->load('service')
+            'message' => 'Consultation status updated successfully.',
+            'data' => $consultation->fresh()->load('service'),
         ]);
     }
 
-
     /**
-     * حذف طلب الاستشارة
+     * Delete consultation.
      */
     public function destroy(Consultation $consultation)
     {
         $consultation->delete();
 
-
         return response()->json([
             'success' => true,
-            'message' => 'Consultation deleted successfully'
+            'message' => 'Consultation deleted successfully.',
         ]);
     }
 }

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreMediaRequest;
+use App\Http\Requests\Admin\UpdateMediaRequest;
 use App\Models\Media;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class MediaController extends Controller
 {
     /**
-     * عرض جميع الملفات
+     * Display a listing of media.
      */
     public function index()
     {
@@ -19,149 +19,90 @@ class MediaController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $media
+            'data' => $media,
         ]);
     }
 
-
     /**
-     * رفع ملف جديد
+     * Store a newly uploaded media file.
      */
-    public function store(Request $request)
+    public function store(StoreMediaRequest $request)
     {
-        $request->validate([
-
-            'file' => [
-                'required',
-                'file',
-                'max:10240', // 10MB
-            ],
-
-            'media_type' => [
-                'required',
-                'in:image,video,document'
-            ],
-
-            'admin_id' => [
-                'nullable',
-                'exists:admins,id'
-            ],
-
-            'alt_text' => [
-                'nullable',
-                'string',
-                'max:255'
-            ],
-
-        ]);
-
-
         $file = $request->file('file');
 
-
-        // حفظ الملف داخل storage/app/public/media
         $path = $file->store('media', 'public');
-
 
         $media = Media::create([
 
-            'admin_id' => $request->admin_id,
+            'admin_id'   => $request->validated()['admin_id'] ?? null,
 
-            'file_name' => $file->getClientOriginalName(),
+            'file_name'  => $file->getClientOriginalName(),
 
-            'file_path' => $path,
+            'file_path'  => $path,
 
-            'extension' => $file->getClientOriginalExtension(),
+            'extension'  => $file->getClientOriginalExtension(),
 
-            'media_type' => $request->media_type,
+            'media_type' => $request->validated()['media_type'],
 
-            'mime_type' => $file->getMimeType(),
+            'mime_type'  => $file->getMimeType(),
 
-            'file_size' => $file->getSize(),
+            'file_size'  => $file->getSize(),
 
-            'alt_text' => $request->alt_text,
+            'alt_text'   => $request->validated()['alt_text'] ?? null,
 
         ]);
-
 
         return response()->json([
             'success' => true,
-            'message' => 'Media uploaded successfully',
-            'data' => $media
-        ]);
+            'message' => 'Media uploaded successfully.',
+            'data' => $media,
+        ], 201);
     }
 
-
     /**
-     * عرض ملف واحد
+     * Display the specified media.
      */
     public function show(Media $media)
     {
         return response()->json([
             'success' => true,
-            'data' => $media
+            'data' => $media,
         ]);
     }
 
-
     /**
-     * تحديث معلومات الملف
+     * Update the specified media.
      */
-    public function update(Request $request, Media $media)
+    public function update(UpdateMediaRequest $request, Media $media)
     {
-
-        $request->validate([
-
-            'alt_text' => [
-                'nullable',
-                'string',
-                'max:255'
-            ],
-
-            'media_type' => [
-                'nullable',
-                'in:image,video,document'
-            ],
-
-        ]);
-
-
         $media->update(
-            $request->only([
-                'alt_text',
-                'media_type'
-            ])
+            $request->validated()
         );
-
 
         return response()->json([
             'success' => true,
-            'message' => 'Media updated successfully',
-            'data' => $media
+            'message' => 'Media updated successfully.',
+            'data' => $media,
         ]);
     }
 
-
     /**
-     * حذف ملف
+     * Remove the specified media.
      */
     public function destroy(Media $media)
     {
-
-        // حذف الملف من التخزين
-        if(Storage::disk('public')->exists($media->file_path))
-        {
+        if (
+            $media->file_path &&
+            Storage::disk('public')->exists($media->file_path)
+        ) {
             Storage::disk('public')->delete($media->file_path);
         }
 
-
-        // حذف من قاعدة البيانات
         $media->delete();
-
 
         return response()->json([
             'success' => true,
-            'message' => 'Media deleted successfully'
+            'message' => 'Media deleted successfully.',
         ]);
     }
 }

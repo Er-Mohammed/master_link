@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StorePostRequest;
+use App\Http\Requests\Admin\UpdatePostRequest;
 use App\Models\Post;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
@@ -27,21 +27,11 @@ class PostController extends Controller
     /**
      * Store a newly created resource.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $validated = $request->validate([
-            'admin_id' => ['nullable', 'exists:admins,id'],
-            'media_id' => ['nullable', 'exists:media,id'],
-            'title' => ['required', 'string', 'max:200'],
-            'slug' => ['required', 'string', 'max:220', 'unique:posts,slug'],
-            'short_description' => ['nullable', 'string'],
-            'content' => ['nullable', 'string'],
-            'published_at' => ['nullable', 'date'],
-            'is_featured' => ['boolean'],
-            'is_active' => ['boolean'],
-        ]);
-
-        $post = Post::create($validated);
+        $post = Post::create(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
@@ -66,26 +56,13 @@ class PostController extends Controller
     /**
      * Update the specified resource.
      */
-    public function update(Request $request, Post $post)
-    {
-        $validated = $request->validate([
-            'admin_id' => ['sometimes', 'nullable', 'exists:admins,id'],
-            'media_id' => ['sometimes', 'nullable', 'exists:media,id'],
-            'title' => ['sometimes', 'string', 'max:200'],
-            'slug' => [
-                'sometimes',
-                'string',
-                'max:220',
-                Rule::unique('posts', 'slug')->ignore($post->id),
-            ],
-            'short_description' => ['nullable', 'string'],
-            'content' => ['nullable', 'string'],
-            'published_at' => ['nullable', 'date'],
-            'is_featured' => ['boolean'],
-            'is_active' => ['boolean'],
-        ]);
-
-        $post->update($validated);
+    public function update(
+        UpdatePostRequest $request,
+        Post $post
+    ) {
+        $post->update(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
