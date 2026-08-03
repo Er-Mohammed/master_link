@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreTestimonialRequest;
+use App\Http\Requests\Admin\UpdateTestimonialRequest;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
     /**
-     * عرض جميع الشهادات
+     * Display a listing of testimonials.
      */
     public function index()
     {
@@ -19,128 +20,65 @@ class TestimonialController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $testimonials
+            'data' => $testimonials,
         ]);
     }
 
-
     /**
-     * إنشاء شهادة جديدة
+     * Store a newly created testimonial.
      */
-    public function store(Request $request)
+    public function store(StoreTestimonialRequest $request)
     {
-        $validated = $request->validate([
-
-            'media_id' => [
-                'nullable',
-                'exists:media,id'
-            ],
-
-            'display_name' => [
-                'required',
-                'string',
-                'max:150'
-            ],
-
-            'message' => [
-                'required',
-                'string'
-            ],
-
-            'sort_order' => [
-                'nullable',
-                'integer'
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean'
-            ],
-
-        ]);
-
-
-        $testimonial = Testimonial::create($validated);
-
+        $testimonial = Testimonial::create(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Testimonial created successfully',
-            'data' => $testimonial->load('media')
+            'message' => 'Testimonial created successfully.',
+            'data' => $testimonial->load('media'),
         ], 201);
     }
 
-
     /**
-     * عرض شهادة واحدة
+     * Display the specified testimonial.
      */
     public function show(Testimonial $testimonial)
     {
         return response()->json([
             'success' => true,
-            'data' => $testimonial->load('media')
+            'data' => $testimonial->load('media'),
         ]);
     }
 
-
     /**
-     * تحديث شهادة
+     * Update the specified testimonial.
      */
-    public function update(Request $request, Testimonial $testimonial)
-    {
-        $validated = $request->validate([
-
-            'media_id' => [
-                'nullable',
-                'exists:media,id'
-            ],
-
-            'display_name' => [
-                'nullable',
-                'string',
-                'max:150'
-            ],
-
-            'message' => [
-                'nullable',
-                'string'
-            ],
-
-            'sort_order' => [
-                'nullable',
-                'integer'
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean'
-            ],
-
-        ]);
-
-
-        $testimonial->update($validated);
-
+    public function update(
+        UpdateTestimonialRequest $request,
+        Testimonial $testimonial
+    ) {
+        $testimonial->update(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
-            'message' => 'Testimonial updated successfully',
-            'data' => $testimonial->load('media')
+            'message' => 'Testimonial updated successfully.',
+            'data' => $testimonial->fresh()->load('media'),
         ]);
     }
 
-
     /**
-     * حذف شهادة
+     * Remove the specified testimonial.
      */
     public function destroy(Testimonial $testimonial)
     {
         $testimonial->delete();
 
-
         return response()->json([
             'success' => true,
-            'message' => 'Testimonial deleted successfully'
+            'message' => 'Testimonial deleted successfully.',
         ]);
     }
 }

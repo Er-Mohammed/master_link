@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreAdminRequest;
+use App\Http\Requests\Admin\UpdateAdminRequest;
 use App\Models\Admin;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
-
     /**
-     * عرض جميع المدراء
+     * Display all admins.
      */
     public function index()
     {
@@ -27,82 +26,40 @@ class AdminController extends Controller
             ->latest()
             ->get();
 
-
         return response()->json([
             'success' => true,
-            'data' => $admins
+            'data' => $admins,
         ]);
     }
 
-
     /**
-     * إنشاء مدير جديد
+     * Store a newly created admin.
      */
-    public function store(Request $request)
+    public function store(StoreAdminRequest $request)
     {
-
-        $validated = $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:150'
-            ],
-
-            'email' => [
-                'required',
-                'email',
-                'max:150',
-                'unique:admins,email'
-            ],
-
-            'password' => [
-                'required',
-                'string',
-                'min:8'
-            ],
-
-            'role' => [
-                'required',
-                Rule::in([
-                    Admin::ROLE_SUPER_ADMIN,
-                    Admin::ROLE_ADMIN,
-                    Admin::ROLE_CONTENT_MANAGER,
-                    Admin::ROLE_MARKETING,
-                ])
-            ],
-
-            'is_active' => [
-                'boolean'
-            ],
-
-        ]);
-
+        $validated = $request->validated();
 
         $validated['password'] = Hash::make(
             $validated['password']
         );
 
-
         $admin = Admin::create($validated);
-
 
         return response()->json([
             'success' => true,
-            'message' => 'Admin created successfully',
+            'message' => 'Admin created successfully.',
             'data' => $admin->only([
                 'id',
                 'name',
                 'email',
                 'role',
-                'is_active'
-            ])
-        ],201);
+                'is_active',
+            ]),
+        ], 201);
     }
 
-
     /**
-     * عرض مدير واحد
+     * Display the specified admin.
      */
     public function show(Admin $admin)
     {
@@ -113,95 +70,53 @@ class AdminController extends Controller
                 'name',
                 'email',
                 'role',
-                'is_active'
-            ])
+                'is_active',
+            ]),
         ]);
     }
 
-
     /**
-     * تحديث بيانات المدير
+     * Update the specified admin.
      */
-    public function update(Request $request, Admin $admin)
-    {
+    public function update(
+        UpdateAdminRequest $request,
+        Admin $admin
+    ) {
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-
-            'name' => [
-                'sometimes',
-                'string',
-                'max:150'
-            ],
-
-            'email' => [
-                'sometimes',
-                'email',
-                'max:150',
-                Rule::unique('admins','email')
-                    ->ignore($admin->id)
-            ],
-
-            'password' => [
-                'nullable',
-                'string',
-                'min:8'
-            ],
-
-            'role' => [
-                'sometimes',
-                Rule::in([
-                    Admin::ROLE_SUPER_ADMIN,
-                    Admin::ROLE_ADMIN,
-                    Admin::ROLE_CONTENT_MANAGER,
-                    Admin::ROLE_MARKETING,
-                ])
-            ],
-
-            'is_active' => [
-                'boolean'
-            ],
-
-        ]);
-
-
-        if(isset($validated['password'])){
-
-            $validated['password'] =
-                Hash::make($validated['password']);
-
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make(
+                $validated['password']
+            );
+        } else {
+            unset($validated['password']);
         }
-
 
         $admin->update($validated);
 
-
         return response()->json([
-            'success'=>true,
-            'message'=>'Admin updated successfully',
-            'data'=>$admin->only([
+            'success' => true,
+            'message' => 'Admin updated successfully.',
+            'data' => $admin->fresh()->only([
                 'id',
                 'name',
                 'email',
                 'role',
-                'is_active'
-            ])
+                'is_active',
+            ]),
         ]);
     }
 
-
     /**
-     * حذف مدير
+     * Remove the specified admin.
      */
     public function destroy(Admin $admin)
     {
-
         $admin->delete();
 
-
         return response()->json([
-            'success'=>true,
-            'message'=>'Admin deleted successfully'
+            'success' => true,
+            'message' => 'Admin deleted successfully.',
         ]);
-
     }
 }

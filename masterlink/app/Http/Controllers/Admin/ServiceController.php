@@ -5,17 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\StoreServiceRequest;
+use App\Http\Requests\Admin\UpdateServiceRequest;
 
 class ServiceController extends Controller
 {
+
     /**
-     * Display a listing of services.
+     * Display all services.
      */
     public function index()
     {
         $services = Service::with('media')
             ->orderBy('sort_order')
             ->get();
+
 
         return response()->json([
             'success' => true,
@@ -24,29 +28,16 @@ class ServiceController extends Controller
     }
 
 
+
     /**
-     * Store a newly created service.
+     * Store new service.
      */
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        $validated = $request->validate([
 
-            'title' => 'required|string|max:255',
-
-            'slug' => 'required|string|max:255|unique:services,slug',
-
-            'short_description' => 'nullable|string',
-
-            'full_description' => 'nullable|string',
-
-            'sort_order' => 'nullable|integer',
-
-            'is_active' => 'boolean',
-
-        ]);
-
-
-        $service = Service::create($validated);
+        $service = Service::create(
+            $request->validated()
+        );
 
 
         return response()->json([
@@ -57,11 +48,13 @@ class ServiceController extends Controller
     }
 
 
+
     /**
-     * Display specific service.
+     * Display one service.
      */
     public function show(Service $service)
     {
+
         $service->load('media');
 
 
@@ -72,37 +65,31 @@ class ServiceController extends Controller
     }
 
 
+
+
     /**
      * Update service.
      */
-    public function update(Request $request, Service $service)
+    public function update(
+        UpdateServiceRequest $request,
+        Service $service
+    )
     {
-        $validated = $request->validate([
 
-            'title' => 'sometimes|string|max:255',
-
-            'slug' => 'sometimes|string|max:255|unique:services,slug,' . $service->id,
-
-            'short_description' => 'nullable|string',
-
-            'full_description' => 'nullable|string',
-
-            'sort_order' => 'nullable|integer',
-
-            'is_active' => 'boolean',
-
-        ]);
-
-
-        $service->update($validated);
+        $service->update(
+            $request->validated()
+        );
 
 
         return response()->json([
             'success' => true,
             'message' => 'Service updated successfully',
-            'data' => $service
+            'data' => $service->fresh()
         ]);
     }
+
+
+
 
 
     /**
@@ -110,6 +97,7 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
+
         $service->delete();
 
 
@@ -118,4 +106,96 @@ class ServiceController extends Controller
             'message' => 'Service deleted successfully'
         ]);
     }
+
+
+
+
+
+
+    /**
+     * Attach media files to service.
+     */
+    public function attachMedia(
+        Request $request,
+        Service $service
+    )
+    {
+
+        $validated = $request->validate([
+
+            'media' => [
+                'required',
+                'array'
+            ],
+
+
+            'media.*.id' => [
+                'required',
+                'exists:media,id'
+            ],
+
+
+            'media.*.sort_order' => [
+                'nullable',
+                'integer'
+            ],
+
+        ]);
+
+
+
+        foreach($validated['media'] as $item)
+        {
+
+            $service->media()
+                ->syncWithoutDetaching([
+
+                    $item['id'] => [
+
+                        'sort_order' =>
+                            $item['sort_order'] ?? 0
+
+                    ]
+
+                ]);
+
+        }
+
+
+
+        return response()->json([
+            'success'=>true,
+            'message'=>'Media attached successfully',
+            'data'=>$service->load('media')
+        ]);
+    }
+
+
+
+
+
+
+
+    /**
+     * Remove media from service.
+     */
+    public function detachMedia(
+        Service $service,
+        $media
+    )
+    {
+
+        $service->media()
+            ->detach($media);
+
+
+
+        return response()->json([
+            'success'=>true,
+            'message'=>'Media detached successfully',
+            'data'=>$service->load('media')
+        ]);
+    }
+
+
 }

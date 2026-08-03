@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreProjectCategoryRequest;
+use App\Http\Requests\Admin\UpdateProjectCategoryRequest;
 use App\Models\ProjectCategory;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ProjectCategoryController extends Controller
 {
@@ -22,46 +22,14 @@ class ProjectCategoryController extends Controller
         ]);
     }
 
-
     /**
      * إنشاء تصنيف جديد
      */
-    public function store(Request $request)
+    public function store(StoreProjectCategoryRequest $request)
     {
-        $validated = $request->validate([
-
-            'name' => [
-                'required',
-                'string',
-                'max:150'
-            ],
-
-            'slug' => [
-                'required',
-                'string',
-                'max:180',
-                'unique:project_categories,slug'
-            ],
-
-            'description' => [
-                'nullable',
-                'string'
-            ],
-
-            'sort_order' => [
-                'nullable',
-                'integer'
-            ],
-
-            'is_active' => [
-                'boolean'
-            ],
-
-        ]);
-
-
-        $category = ProjectCategory::create($validated);
-
+        $category = ProjectCategory::create(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
@@ -70,7 +38,6 @@ class ProjectCategoryController extends Controller
         ], 201);
     }
 
-
     /**
      * عرض تصنيف واحد
      */
@@ -78,63 +45,29 @@ class ProjectCategoryController extends Controller
     {
         $projectCategory->load('projects');
 
-
         return response()->json([
             'success' => true,
             'data' => $projectCategory,
         ]);
     }
-
 
     /**
      * تحديث تصنيف
      */
-    public function update(Request $request, ProjectCategory $projectCategory)
-    {
-        $validated = $request->validate([
-
-            'name' => [
-                'sometimes',
-                'string',
-                'max:150'
-            ],
-
-            'slug' => [
-                'sometimes',
-                'string',
-                'max:180',
-                Rule::unique(
-                    'project_categories',
-                    'slug'
-                )->ignore($projectCategory->id),
-            ],
-
-            'description' => [
-                'nullable',
-                'string'
-            ],
-
-            'sort_order' => [
-                'integer'
-            ],
-
-            'is_active' => [
-                'boolean'
-            ],
-
-        ]);
-
-
-        $projectCategory->update($validated);
-
+    public function update(
+        UpdateProjectCategoryRequest $request,
+        ProjectCategory $projectCategory
+    ) {
+        $projectCategory->update(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Project category updated successfully.',
-            'data' => $projectCategory,
+            'data' => $projectCategory->fresh()->load('projects'),
         ]);
     }
-
 
     /**
      * حذف تصنيف
@@ -142,7 +75,6 @@ class ProjectCategoryController extends Controller
     public function destroy(ProjectCategory $projectCategory)
     {
         $projectCategory->delete();
-
 
         return response()->json([
             'success' => true,
