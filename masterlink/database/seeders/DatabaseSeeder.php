@@ -15,13 +15,14 @@ use App\Models\ClientLogo;
 use App\Models\SiteSetting;
 use App\Models\ProjectMedia;
 use App\Models\Testimonial;
+
+
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
+
     public function run(): void
     {
+
 
         /*
         |--------------------------------------------------------------------------
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
         */
 
         Admin::factory(3)->create();
+
 
 
         /*
@@ -41,6 +43,7 @@ class DatabaseSeeder extends Seeder
         Media::factory(30)->create();
 
 
+
         /*
         |--------------------------------------------------------------------------
         | Services
@@ -48,6 +51,7 @@ class DatabaseSeeder extends Seeder
         */
 
         Service::factory(6)->create();
+
 
 
         /*
@@ -58,12 +62,14 @@ class DatabaseSeeder extends Seeder
 
         Service::all()->each(function ($service) {
 
+
             $mediaIds = Media::inRandomOrder()
                 ->limit(3)
                 ->pluck('id');
 
 
             foreach ($mediaIds as $mediaId) {
+
 
                 $service->media()->attach($mediaId, [
 
@@ -76,6 +82,7 @@ class DatabaseSeeder extends Seeder
         });
 
 
+
         /*
         |--------------------------------------------------------------------------
         | Site Settings
@@ -85,6 +92,7 @@ class DatabaseSeeder extends Seeder
         SiteSetting::factory(10)->create();
 
 
+
         /*
         |--------------------------------------------------------------------------
         | Project Categories
@@ -92,6 +100,7 @@ class DatabaseSeeder extends Seeder
         */
 
         ProjectCategory::factory(5)->create();
+
 
 
         /*
@@ -110,6 +119,7 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
+
         Project::all()->each(function ($project) {
 
 
@@ -123,14 +133,13 @@ class DatabaseSeeder extends Seeder
 
                 ProjectMedia::create([
 
-                    'project_id' => $project->id,
+                    'project_id'=>$project->id,
 
-                    'media_id' => $mediaId,
+                    'media_id'=>$mediaId,
 
-                    'sort_order' => fake()->numberBetween(0,10),
+                    'sort_order'=>fake()->numberBetween(0,10)
 
                 ]);
-
 
             }
 
@@ -144,6 +153,7 @@ class DatabaseSeeder extends Seeder
         | Project Services
         |--------------------------------------------------------------------------
         */
+
 
         Project::all()->each(function ($project) {
 
@@ -167,8 +177,8 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        Media::whereDoesntHave('clientLogo')
-            ->inRandomOrder()
+
+        Media::inRandomOrder()
             ->limit(8)
             ->get()
             ->each(function ($media) {
@@ -176,31 +186,36 @@ class DatabaseSeeder extends Seeder
 
                 ClientLogo::factory()->create([
 
-                    'media_id' => $media->id
+                    'media_id'=>$media->id
 
                 ]);
 
+            });
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Testimonials
+        |--------------------------------------------------------------------------
+        */
+
+
+        Media::inRandomOrder()
+            ->limit(6)
+            ->get()
+            ->each(function ($media) {
+
+
+                Testimonial::factory()->create([
+
+                    'media_id'=>$media->id
+
+                ]);
 
             });
 
-/*
-|--------------------------------------------------------------------------
-| Testimonials
-|--------------------------------------------------------------------------
-*/
 
-Media::inRandomOrder()
-    ->take(6)
-    ->get()
-    ->each(function ($media) {
-
-        Testimonial::factory()->create([
-
-            'media_id' => $media->id,
-
-        ]);
-
-    });
 
         /*
         |--------------------------------------------------------------------------
@@ -219,6 +234,7 @@ Media::inRandomOrder()
         */
 
         Consultation::factory(20)->create();
+
 
     }
 }

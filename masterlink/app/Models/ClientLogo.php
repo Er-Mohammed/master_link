@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ClientLogo extends Model
 {
     use HasFactory, SoftDeletes;
+
+
 
     protected $fillable = [
         'media_id',
@@ -18,11 +21,15 @@ class ClientLogo extends Model
         'is_active',
     ];
 
+
+
     /**
      * ملف الوسائط المرتبط بالشعار
      */
-    public function media()
+    public function media(): BelongsTo
     {
-        return $this->belongsTo(Media::class);
+        return $this->belongsTo(
+            Media::class
+        );
     }
 }

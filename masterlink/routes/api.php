@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 // Admin Controllers
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\PostController;
@@ -14,167 +15,126 @@ use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
 use App\Http\Controllers\Admin\AdminController;
 
-
 Route::prefix('admin')->group(function () {
-
 
     /*
     |--------------------------------------------------------------------------
-    | Services Media Management
+    | Authentication
     |--------------------------------------------------------------------------
     */
 
     Route::post(
-        'services/{service}/media',
-        [ServiceController::class, 'attachMedia']
-    )
-    ->name('services.media.attach');
-
-
-    Route::delete(
-        'services/{service}/media/{media}',
-        [ServiceController::class, 'detachMedia']
-    )
-    ->name('services.media.detach');
-
-
+        'login',
+        [AuthController::class, 'login']
+    )->name('admin.login');
 
     /*
     |--------------------------------------------------------------------------
-    | Services
+    | Protected Admin API
     |--------------------------------------------------------------------------
     */
 
-    Route::apiResource(
-        'services',
-        ServiceController::class
-    );
+    Route::middleware('auth:sanctum')->group(function () {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Current Admin
+        |--------------------------------------------------------------------------
+        */
 
+        Route::get(
+            'me',
+            [AuthController::class, 'me']
+        )->name('admin.me');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Projects
-    |--------------------------------------------------------------------------
-    */
+        Route::post(
+            'logout',
+            [AuthController::class, 'logout']
+        )->name('admin.logout');
 
-    Route::apiResource(
-        'projects',
-        ProjectController::class
-    );
+        /*
+        |--------------------------------------------------------------------------
+        | Services Media Management
+        |--------------------------------------------------------------------------
+        */
 
+        Route::post(
+            'services/{service}/media',
+            [ServiceController::class, 'attachMedia']
+        )
+        ->middleware('role:super_admin,admin')
+        ->name('services.media.attach');
 
+        Route::delete(
+            'services/{service}/media/{media}',
+            [ServiceController::class, 'detachMedia']
+        )
+        ->middleware('role:super_admin,admin')
+        ->name('services.media.detach');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Project Categories
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Resources
+        |--------------------------------------------------------------------------
+        */
 
-    Route::apiResource(
-        'project-categories',
-        ProjectCategoryController::class
-    );
+        Route::apiResource(
+            'services',
+            ServiceController::class
+        )->middleware('role:super_admin,admin');
 
+        Route::apiResource(
+            'projects',
+            ProjectController::class
+        )->middleware('role:super_admin,admin,marketing');
 
+        Route::apiResource(
+            'project-categories',
+            ProjectCategoryController::class
+        )->middleware('role:super_admin,admin');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Posts
-    |--------------------------------------------------------------------------
-    */
+        Route::apiResource(
+            'posts',
+            PostController::class
+        )->middleware('role:super_admin,admin,content_manager');
 
-    Route::apiResource(
-        'posts',
-        PostController::class
-    );
+        Route::apiResource(
+            'media',
+            MediaController::class
+        )->middleware('role:super_admin,admin,content_manager,marketing');
 
+        Route::apiResource(
+            'client-logos',
+            ClientLogoController::class
+        )->middleware('role:super_admin,admin,marketing');
 
+        Route::apiResource(
+            'testimonials',
+            TestimonialController::class
+        )->middleware('role:super_admin,admin,content_manager');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Media Files
-    |--------------------------------------------------------------------------
-    */
+        Route::apiResource(
+            'consultations',
+            ConsultationController::class
+        )
+        ->only([
+            'index',
+            'show',
+            'update',
+            'destroy'
+        ])
+        ->middleware('role:super_admin,admin,marketing');
 
-    Route::apiResource(
-        'media',
-        MediaController::class
-    )
-    ->parameters([
-        'media' => 'media'
-    ]);
+        Route::apiResource(
+            'site-settings',
+            SiteSettingController::class
+        )->middleware('role:super_admin');
 
+        Route::apiResource(
+            'admins',
+            AdminController::class
+        )->middleware('role:super_admin');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Client Logos
-    |--------------------------------------------------------------------------
-    */
-
-    Route::apiResource(
-        'client-logos',
-        ClientLogoController::class
-    );
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Testimonials
-    |--------------------------------------------------------------------------
-    */
-
-    Route::apiResource(
-        'testimonials',
-        TestimonialController::class
-    );
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Consultations
-    |--------------------------------------------------------------------------
-    */
-
-    Route::apiResource(
-        'consultations',
-        ConsultationController::class
-    )
-    ->only([
-        'index',
-        'show',
-        'update',
-        'destroy'
-    ]);
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Website Settings
-    |--------------------------------------------------------------------------
-    */
-
-    Route::apiResource(
-        'site-settings',
-        SiteSettingController::class
-    );
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Management
-    |--------------------------------------------------------------------------
-    */
-
-    Route::apiResource(
-        'admins',
-        AdminController::class
-    );
-
+    });
 
 });
