@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class Admin extends Authenticatable
 {
     use HasApiTokens, HasFactory, SoftDeletes, Notifiable;
-
 
     /*
     |--------------------------------------------------------------------------
@@ -20,51 +19,48 @@ class Admin extends Authenticatable
     */
 
     public const ROLE_SUPER_ADMIN = 'super_admin';
-
     public const ROLE_ADMIN = 'admin';
-
     public const ROLE_CONTENT_MANAGER = 'content_manager';
-
     public const ROLE_MARKETING = 'marketing';
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Fillable
+    |--------------------------------------------------------------------------
+    */
 
     protected $fillable = [
-
         'name',
-
         'email',
-
         'password',
-
         'role',
-
         'is_active',
-
     ];
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Hidden
+    |--------------------------------------------------------------------------
+    */
 
     protected $hidden = [
-
         'password',
-
         'remember_token',
-
     ];
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Casts
+    |--------------------------------------------------------------------------
+    */
 
     protected function casts(): array
     {
         return [
-
             'is_active' => 'boolean',
-
+            'password' => 'hashed',
         ];
     }
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -72,20 +68,15 @@ class Admin extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-
     public function media()
     {
         return $this->hasMany(Media::class);
     }
 
-
-
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -93,24 +84,18 @@ class Admin extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-
     public function hasRole(string $role): bool
     {
         return $this->role === $role;
     }
-
-
 
     public function hasAnyRole(array $roles): bool
     {
         return in_array($this->role, $roles, true);
     }
 
-
-
     public function isActive(): bool
     {
         return $this->is_active;
     }
-
 }

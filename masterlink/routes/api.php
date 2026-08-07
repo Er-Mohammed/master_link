@@ -17,66 +17,26 @@ use App\Http\Controllers\Admin\AdminController;
 
 Route::prefix('admin')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Authentication
-    |--------------------------------------------------------------------------
-    */
-
-    Route::post(
-        'login',
-        [AuthController::class, 'login']
-    )->name('admin.login');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Protected Admin API
-    |--------------------------------------------------------------------------
-    */
+    Route::post('login', [AuthController::class, 'login'])
+        ->name('admin.login');
 
     Route::middleware('auth:sanctum')->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Current Admin
-        |--------------------------------------------------------------------------
-        */
+        Route::get('me', [AuthController::class, 'me'])
+            ->name('admin.me');
 
-        Route::get(
-            'me',
-            [AuthController::class, 'me']
-        )->name('admin.me');
-
-        Route::post(
-            'logout',
-            [AuthController::class, 'logout']
-        )->name('admin.logout');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Services Media Management
-        |--------------------------------------------------------------------------
-        */
+        Route::post('logout', [AuthController::class, 'logout'])
+            ->name('admin.logout');
 
         Route::post(
             'services/{service}/media',
             [ServiceController::class, 'attachMedia']
-        )
-        ->middleware('role:super_admin,admin')
-        ->name('services.media.attach');
+        )->middleware('role:super_admin,admin');
 
         Route::delete(
             'services/{service}/media/{media}',
             [ServiceController::class, 'detachMedia']
-        )
-        ->middleware('role:super_admin,admin')
-        ->name('services.media.detach');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Resources
-        |--------------------------------------------------------------------------
-        */
+        )->middleware('role:super_admin,admin');
 
         Route::apiResource(
             'services',
@@ -117,12 +77,7 @@ Route::prefix('admin')->group(function () {
             'consultations',
             ConsultationController::class
         )
-        ->only([
-            'index',
-            'show',
-            'update',
-            'destroy'
-        ])
+        ->only(['index', 'show', 'update', 'destroy'])
         ->middleware('role:super_admin,admin,marketing');
 
         Route::apiResource(
