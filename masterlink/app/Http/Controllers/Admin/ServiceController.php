@@ -24,7 +24,9 @@ class ServiceController extends Controller
     {
         $service = Service::create($request->validated());
 
-        return new ServiceResource($service->load('media'));
+        return new ServiceResource(
+            $service->load('media')
+        );
     }
 
     public function show(Service $service)
@@ -34,11 +36,15 @@ class ServiceController extends Controller
         return new ServiceResource($service);
     }
 
-    public function update(UpdateServiceRequest $request, Service $service)
-    {
+    public function update(
+        UpdateServiceRequest $request,
+        Service $service
+    ) {
         $service->update($request->validated());
 
-        return new ServiceResource($service->fresh()->load('media'));
+        return new ServiceResource(
+            $service->fresh()->load('media')
+        );
     }
 
     public function destroy(Service $service)
@@ -51,8 +57,10 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function attachMedia(Request $request, Service $service)
-    {
+    public function attachMedia(
+        Request $request,
+        Service $service
+    ) {
         $validated = $request->validate([
             'media' => ['required', 'array'],
             'media.*.id' => ['required', 'exists:media,id'],
@@ -67,13 +75,19 @@ class ServiceController extends Controller
             ]);
         }
 
-        return new ServiceResource($service->load('media'));
+        return new ServiceResource(
+            $service->load('media')
+        );
     }
 
-    public function detachMedia(Service $service, $media)
-    {
+    public function detachMedia(
+        Service $service,
+        $media
+    ) {
         $service->media()->detach($media);
 
-        return new ServiceResource($service->load('media'));
+        return new ServiceResource(
+            $service->load('media')
+        );
     }
 }

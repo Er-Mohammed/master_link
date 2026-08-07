@@ -50,10 +50,10 @@ return new class extends Migration
             |--------------------------------------------------------------------------
             */
 
-            $table->unique([
-                'service_id',
-                'media_id'
-            ]);
+          //  $table->unique([
+            //    'service_id',
+              //  'media_id'
+            //]);
 
         });
     }
