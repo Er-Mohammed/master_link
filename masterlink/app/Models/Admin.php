@@ -68,11 +68,17 @@ class Admin extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * الوسائط التي أنشأها المسؤول.
+     */
     public function media()
     {
         return $this->hasMany(Media::class);
     }
 
+    /**
+     * المقالات التي أنشأها المسؤول.
+     */
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -84,18 +90,59 @@ class Admin extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * التحقق من دور محدد.
+     */
     public function hasRole(string $role): bool
     {
         return $this->role === $role;
     }
 
+    /**
+     * التحقق من امتلاك أحد الأدوار المحددة.
+     */
     public function hasAnyRole(array $roles): bool
     {
         return in_array($this->role, $roles, true);
     }
 
+    /**
+     * التحقق من أن الحساب نشط.
+     */
     public function isActive(): bool
     {
         return $this->is_active;
+    }
+
+    /**
+     * التحقق من أن المسؤول Super Admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * التحقق من أن المسؤول Admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE_ADMIN);
+    }
+
+    /**
+     * التحقق من أن المسؤول Content Manager.
+     */
+    public function isContentManager(): bool
+    {
+        return $this->hasRole(self::ROLE_CONTENT_MANAGER);
+    }
+
+    /**
+     * التحقق من أن المسؤول Marketing.
+     */
+    public function isMarketing(): bool
+    {
+        return $this->hasRole(self::ROLE_MARKETING);
     }
 }
