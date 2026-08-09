@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Service;
-use Illuminate\Http\Request;
 use App\Http\Requests\Admin\StoreServiceRequest;
 use App\Http\Requests\Admin\UpdateServiceRequest;
 use App\Http\Resources\Admin\ServiceResource;
+use App\Models\Service;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ServiceController extends Controller
 {
     public function index()
     {
+        Gate::authorize('viewAny', Service::class);
+
         $services = Service::with('media')
             ->orderBy('sort_order')
             ->get();
@@ -22,7 +25,11 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request)
     {
-        $service = Service::create($request->validated());
+        Gate::authorize('create', Service::class);
+
+        $service = Service::create(
+            $request->validated()
+        );
 
         return new ServiceResource(
             $service->load('media')
@@ -31,6 +38,8 @@ class ServiceController extends Controller
 
     public function show(Service $service)
     {
+        Gate::authorize('view', $service);
+
         $service->load('media');
 
         return new ServiceResource($service);
@@ -40,7 +49,11 @@ class ServiceController extends Controller
         UpdateServiceRequest $request,
         Service $service
     ) {
-        $service->update($request->validated());
+        Gate::authorize('update', $service);
+
+        $service->update(
+            $request->validated()
+        );
 
         return new ServiceResource(
             $service->fresh()->load('media')
@@ -49,6 +62,8 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
+        Gate::authorize('delete', $service);
+
         $service->delete();
 
         return response()->json([
@@ -61,10 +76,21 @@ class ServiceController extends Controller
         Request $request,
         Service $service
     ) {
+        Gate::authorize('update', $service);
+
         $validated = $request->validate([
-            'media' => ['required', 'array'],
-            'media.*.id' => ['required', 'exists:media,id'],
-            'media.*.sort_order' => ['nullable', 'integer'],
+            'media' => [
+                'required',
+                'array',
+            ],
+            'media.*.id' => [
+                'required',
+                'exists:media,id',
+            ],
+            'media.*.sort_order' => [
+                'nullable',
+                'integer',
+            ],
         ]);
 
         foreach ($validated['media'] as $item) {
@@ -84,6 +110,8 @@ class ServiceController extends Controller
         Service $service,
         $media
     ) {
+        Gate::authorize('update', $service);
+
         $service->media()->detach($media);
 
         return new ServiceResource(

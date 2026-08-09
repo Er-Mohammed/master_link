@@ -27,6 +27,10 @@ Route::prefix('admin')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout'])
             ->name('admin.logout');
+        Route::post(
+            'change-password',
+            [AuthController::class, 'changePassword']
+        )->name('admin.change-password');
 
         Route::post(
             'services/{service}/media',
@@ -77,8 +81,8 @@ Route::prefix('admin')->group(function () {
             'consultations',
             ConsultationController::class
         )
-        ->only(['index', 'show', 'update', 'destroy'])
-        ->middleware('role:super_admin,admin,marketing');
+            ->only(['index', 'show', 'update', 'destroy'])
+            ->middleware('role:super_admin,admin,marketing');
 
         Route::apiResource(
             'site-settings',
@@ -89,7 +93,5 @@ Route::prefix('admin')->group(function () {
             'admins',
             AdminController::class
         )->middleware('role:super_admin');
-
     });
-
 });

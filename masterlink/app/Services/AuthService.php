@@ -8,56 +8,61 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-
     /**
-     * تسجيل دخول المدير
+     * تسجيل دخول المدير.
      */
     public function login(array $data): array
     {
-
-        $admin = Admin::where('email', $data['email'])
+        $admin = Admin::query()
+            ->where('email', $data['email'])
             ->first();
-
-
-        if (!$admin) {
-
-            throw ValidationException::withMessages([
-                'email' => 'بيانات الدخول غير صحيحة.'
-            ]);
-
-        }
-
-
-        if (!$admin->is_active) {
-
-            throw ValidationException::withMessages([
-                'email' => 'الحساب غير مفعل.'
-            ]);
-
-        }
-
-
-        if (!Hash::check(
-            $data['password'],
-            $admin->password
-        )) {
-
-            throw ValidationException::withMessages([
-                'email' => 'بيانات الدخول غير صحيحة.'
-            ]);
-
-        }
-
 
         /*
         |--------------------------------------------------------------------------
-        | حذف التوكنات القديمة
+        | التحقق من وجود الحساب
+        |--------------------------------------------------------------------------
+        */
+
+        if (! $admin) {
+            throw ValidationException::withMessages([
+                'email' => 'بيانات الدخول غير صحيحة.',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | التحقق من حالة الحساب
+        |--------------------------------------------------------------------------
+        */
+
+        if (! $admin->isActive()) {
+            throw ValidationException::withMessages([
+                'email' => 'الحساب غير مفعل.',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | التحقق من كلمة المرور
+        |--------------------------------------------------------------------------
+        */
+
+        if (! Hash::check(
+            $data['password'],
+            $admin->password
+        )) {
+            throw ValidationException::withMessages([
+                'email' => 'بيانات الدخول غير صحيحة.',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | جلسة واحدة فقط
         |--------------------------------------------------------------------------
         */
 
         $admin->tokens()->delete();
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -69,35 +74,64 @@ class AuthService
             ->createToken('admin-token')
             ->plainTextToken;
 
-
-
         return [
-
             'admin' => $admin,
-
             'token' => $token,
-
         ];
-
     }
 
-
-
     /**
-     * تسجيل خروج المدير
+     * تسجيل خروج المدير.
      */
     public function logout(Admin $admin): void
     {
+        $admin->currentAccessToken()?->delete();
+    }
+    /**
+     * تغيير كلمة مرور المدير.
+     */
+    public function changePassword(
+        Admin $admin,
+        string $currentPassword,
+        string $newPassword
+    ): string {
+        /*
+    |--------------------------------------------------------------------------
+    | التحقق من كلمة المرور الحالية
+    |--------------------------------------------------------------------------
+    */
 
-        $token = $admin->currentAccessToken();
-
-
-        if ($token) {
-
-            $token->delete();
-
+        if (! Hash::check($currentPassword, $admin->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => 'كلمة المرور الحالية غير صحيحة.',
+            ]);
         }
 
-    }
+        /*
+    |--------------------------------------------------------------------------
+    | تحديث كلمة المرور
+    |--------------------------------------------------------------------------
+    */
 
+        $admin->password = $newPassword;
+        $admin->save();
+
+        /*
+    |--------------------------------------------------------------------------
+    | إلغاء جميع الجلسات الحالية
+    |--------------------------------------------------------------------------
+    */
+
+        $admin->tokens()->delete();
+
+        /*
+    |--------------------------------------------------------------------------
+    | إنشاء Token جديد
+    |--------------------------------------------------------------------------
+    */
+
+        return $admin
+            ->createToken('admin-token')
+            ->plainTextToken;
+    }
 }
