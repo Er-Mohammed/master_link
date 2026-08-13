@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\ChangePasswordRequest;
 use App\Http\Requests\Admin\LoginRequest;
 use App\Http\Resources\Admin\AuthResource;
 use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -19,7 +20,7 @@ class AuthController extends Controller
     /**
      * Login admin.
      */
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $result = $this->authService->login(
             $request->validated()
@@ -27,18 +28,16 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Login successful.',
+            'message' => 'تم تسجيل الدخول بنجاح.',
             'token' => $result['token'],
-            'admin' => new AuthResource(
-                $result['admin']
-            ),
+            'admin' => new AuthResource($result['admin']),
         ]);
     }
 
     /**
-     * Current authenticated admin.
+     * Get authenticated admin.
      */
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -51,7 +50,7 @@ class AuthController extends Controller
     /**
      * Logout admin.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $this->authService->logout(
             $request->user()
@@ -59,16 +58,16 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout successful.',
+            'message' => 'تم تسجيل الخروج بنجاح.',
         ]);
     }
 
     /**
-     * Change authenticated admin password.
+     * Change admin password.
      */
     public function changePassword(
         ChangePasswordRequest $request
-    ) {
+    ): JsonResponse {
         $token = $this->authService->changePassword(
             $request->user(),
             $request->validated('current_password'),
@@ -77,7 +76,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Password changed successfully.',
+            'message' => 'تم تغيير كلمة المرور بنجاح.',
             'token' => $token,
         ]);
     }

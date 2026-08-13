@@ -8,84 +8,93 @@ use App\Models\ProjectCategory;
 class ProjectCategoryPolicy
 {
     /**
-     * View any project categories.
+     * Determine whether the admin can view any categories.
      */
     public function viewAny(Admin $admin): bool
     {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+            ]);
     }
 
     /**
-     * View a specific project category.
+     * Determine whether the admin can view a category.
      */
-    public function view(Admin $admin, ProjectCategory $category): bool
-    {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+    public function view(
+        Admin $admin,
+        ProjectCategory $projectCategory
+    ): bool {
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+            ]);
     }
 
     /**
-     * Create a project category.
+     * Determine whether the admin can create categories.
      */
     public function create(Admin $admin): bool
     {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+            ]);
     }
 
     /**
-     * Update a project category.
+     * Determine whether the admin can update a category.
      */
     public function update(
         Admin $admin,
-        ProjectCategory $category
+        ProjectCategory $projectCategory
     ): bool {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+            ]);
     }
 
     /**
-     * Delete a project category.
+     * Determine whether the admin can delete a category.
      */
     public function delete(
         Admin $admin,
-        ProjectCategory $category
+        ProjectCategory $projectCategory
     ): bool {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+            ]);
     }
 
     /**
-     * Restore a soft-deleted project category.
+     * Determine whether the admin can restore a category.
      */
     public function restore(
         Admin $admin,
-        ProjectCategory $category
+        ProjectCategory $projectCategory
     ): bool {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+            ]);
     }
 
     /**
-     * Permanently delete a project category.
+     * Determine whether the admin can permanently delete a category.
      */
     public function forceDelete(
         Admin $admin,
-        ProjectCategory $category
+        ProjectCategory $projectCategory
     ): bool {
-        return $admin->isSuperAdmin();
+        return $admin->isActive()
+            && $admin->isSuperAdmin();
     }
 }

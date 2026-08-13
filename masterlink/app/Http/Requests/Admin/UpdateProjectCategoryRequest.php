@@ -7,17 +7,28 @@ use Illuminate\Validation\Rule;
 
 class UpdateProjectCategoryRequest extends FormRequest
 {
+    /**
+     * Determine whether the admin can update this category.
+     */
     public function authorize(): bool
     {
-        return true;
+        $category = $this->route('project_category');
+
+        return $category
+            && ($this->user()?->can(
+                'update',
+                $category
+            ) ?? false);
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
-        $projectCategory = $this->route('project_category');
+        $category = $this->route('project_category');
 
         return [
-
             'name' => [
                 'sometimes',
                 'string',
@@ -28,23 +39,28 @@ class UpdateProjectCategoryRequest extends FormRequest
                 'sometimes',
                 'string',
                 'max:180',
-                Rule::unique('project_categories', 'slug')
-                    ->ignore($projectCategory),
+                Rule::unique(
+                    'project_categories',
+                    'slug'
+                )->ignore($category?->id),
             ],
 
             'description' => [
+                'sometimes',
                 'nullable',
                 'string',
             ],
 
             'sort_order' => [
+                'sometimes',
                 'integer',
+                'min:0',
             ],
 
             'is_active' => [
+                'sometimes',
                 'boolean',
             ],
-
         ];
     }
 }

@@ -88,12 +88,11 @@ class TestimonialPolicy
     /**
      * Permanently delete a testimonial.
      */
-    public function forceDelete(Admin $admin, Testimonial $testimonial): bool
-    {
+    public function forceDelete(
+        Admin $admin,
+        Testimonial $testimonial
+    ): bool {
         return $admin->isActive()
-            && $admin->hasAnyRole([
-                Admin::ROLE_SUPER_ADMIN,
-                Admin::ROLE_ADMIN,
-            ]);
+            && $admin->isSuperAdmin();
     }
 }

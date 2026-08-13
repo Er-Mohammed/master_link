@@ -5,6 +5,9 @@ namespace Database\Factories;
 use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<\App\Models\Testimonial>
+ */
 class TestimonialFactory extends Factory
 {
     /**
@@ -13,10 +16,12 @@ class TestimonialFactory extends Factory
     public function definition(): array
     {
         return [
-
-            // يستخدم صورة موجودة أو ينشئ واحدة إذا لم توجد
-            'media_id' => Media::query()->inRandomOrder()->value('id')
-                ?? Media::factory(),
+            'media_id' => fake()->boolean(70)
+                ? (
+                    Media::query()->inRandomOrder()->value('id')
+                    ?? Media::factory()->create()->id
+                )
+                : null,
 
             'display_name' => fake()->randomElement([
                 fake()->name(),
@@ -28,7 +33,6 @@ class TestimonialFactory extends Factory
             'sort_order' => fake()->numberBetween(0, 20),
 
             'is_active' => true,
-
         ];
     }
 }

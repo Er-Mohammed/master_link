@@ -14,7 +14,6 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'category_id' => [
                 'required',
                 'exists:project_categories,id',
@@ -52,6 +51,7 @@ class StoreProjectRequest extends FormRequest
             'project_url' => [
                 'nullable',
                 'url',
+                'max:2048',
             ],
 
             'completion_date' => [
@@ -60,17 +60,20 @@ class StoreProjectRequest extends FormRequest
             ],
 
             'is_featured' => [
+                'sometimes',
                 'boolean',
             ],
 
             'sort_order' => [
+                'sometimes',
                 'integer',
+                'min:0',
             ],
 
             'is_active' => [
+                'sometimes',
                 'boolean',
             ],
-
         ];
     }
 }

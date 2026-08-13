@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTestimonialRequest;
 use App\Http\Requests\Admin\UpdateTestimonialRequest;
+use App\Http\Resources\Admin\TestimonialResource;
 use App\Models\Testimonial;
 
 class TestimonialController extends Controller
@@ -14,14 +15,14 @@ class TestimonialController extends Controller
      */
     public function index()
     {
-        $testimonials = Testimonial::with('media')
+        $this->authorize('viewAny', Testimonial::class);
+
+        $testimonials = Testimonial::query()
+            ->with('media')
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $testimonials,
-        ]);
+        return TestimonialResource::collection($testimonials);
     }
 
     /**
@@ -29,14 +30,18 @@ class TestimonialController extends Controller
      */
     public function store(StoreTestimonialRequest $request)
     {
+        $this->authorize('create', Testimonial::class);
+
         $testimonial = Testimonial::create(
             $request->validated()
         );
 
+        $testimonial->load('media');
+
         return response()->json([
             'success' => true,
             'message' => 'Testimonial created successfully.',
-            'data' => $testimonial->load('media'),
+            'data' => new TestimonialResource($testimonial),
         ], 201);
     }
 
@@ -45,9 +50,13 @@ class TestimonialController extends Controller
      */
     public function show(Testimonial $testimonial)
     {
+        $this->authorize('view', $testimonial);
+
+        $testimonial->load('media');
+
         return response()->json([
             'success' => true,
-            'data' => $testimonial->load('media'),
+            'data' => new TestimonialResource($testimonial),
         ]);
     }
 
@@ -58,14 +67,20 @@ class TestimonialController extends Controller
         UpdateTestimonialRequest $request,
         Testimonial $testimonial
     ) {
+        $this->authorize('update', $testimonial);
+
         $testimonial->update(
             $request->validated()
         );
 
+        $testimonial = $testimonial->fresh();
+
+        $testimonial->load('media');
+
         return response()->json([
             'success' => true,
             'message' => 'Testimonial updated successfully.',
-            'data' => $testimonial->fresh()->load('media'),
+            'data' => new TestimonialResource($testimonial),
         ]);
     }
 
@@ -74,6 +89,8 @@ class TestimonialController extends Controller
      */
     public function destroy(Testimonial $testimonial)
     {
+        $this->authorize('delete', $testimonial);
+
         $testimonial->delete();
 
         return response()->json([

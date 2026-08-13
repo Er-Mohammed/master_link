@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Models\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class StoreAdminRequest extends FormRequest
 {
@@ -33,7 +34,7 @@ class StoreAdminRequest extends FormRequest
             'password' => [
                 'required',
                 'string',
-                'min:8',
+                Password::defaults(),
             ],
 
             'role' => [

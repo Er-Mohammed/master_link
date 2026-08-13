@@ -23,8 +23,10 @@ class PostPolicy
     /**
      * View a specific post.
      */
-    public function view(Admin $admin, Post $post): bool
-    {
+    public function view(
+        Admin $admin,
+        Post $post
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -49,8 +51,10 @@ class PostPolicy
     /**
      * Update a post.
      */
-    public function update(Admin $admin, Post $post): bool
-    {
+    public function update(
+        Admin $admin,
+        Post $post
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -62,8 +66,10 @@ class PostPolicy
     /**
      * Delete a post.
      */
-    public function delete(Admin $admin, Post $post): bool
-    {
+    public function delete(
+        Admin $admin,
+        Post $post
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -75,21 +81,26 @@ class PostPolicy
     /**
      * Restore a deleted post.
      */
-    public function restore(Admin $admin, Post $post): bool
-    {
+    public function restore(
+        Admin $admin,
+        Post $post
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
                 Admin::ROLE_ADMIN,
+                Admin::ROLE_CONTENT_MANAGER,
             ]);
     }
 
     /**
      * Permanently delete a post.
      */
-    public function forceDelete(Admin $admin, Post $post): bool
-    {
+    public function forceDelete(
+        Admin $admin,
+        Post $post
+    ): bool {
         return $admin->isActive()
-            && $admin->hasRole(Admin::ROLE_SUPER_ADMIN);
+            && $admin->isSuperAdmin();
     }
 }

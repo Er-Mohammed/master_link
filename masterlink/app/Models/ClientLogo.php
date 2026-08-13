@@ -11,8 +11,6 @@ class ClientLogo extends Model
 {
     use HasFactory, SoftDeletes;
 
-
-
     protected $fillable = [
         'media_id',
         'company_name',
@@ -21,15 +19,17 @@ class ClientLogo extends Model
         'is_active',
     ];
 
-
+    protected $casts = [
+        'sort_order' => 'integer',
+        'is_active' => 'boolean',
+    ];
 
     /**
-     * ملف الوسائط المرتبط بالشعار
+     * Media file associated with the client logo.
      */
     public function media(): BelongsTo
     {
-        return $this->belongsTo(
-            Media::class
-        );
+        return $this->belongsTo(Media::class);
     }
 }
+
