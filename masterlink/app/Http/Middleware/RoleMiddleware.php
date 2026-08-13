@@ -16,64 +16,22 @@ class RoleMiddleware
         Closure $next,
         string ...$roles
     ): Response {
-
         $admin = $request->user();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Authentication
-        |--------------------------------------------------------------------------
-        */
-
-        if (!$admin) {
-
+        if (! $admin) {
             return response()->json([
-
                 'success' => false,
-
                 'message' => 'Unauthenticated.',
-
             ], 401);
-
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Account Status
-        |--------------------------------------------------------------------------
-        */
-
-        if (!$admin->is_active) {
-
+        if (! $admin->hasAnyRole($roles)) {
             return response()->json([
-
                 'success' => false,
-
-                'message' => 'Your account has been deactivated.',
-
-            ], 403);
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Authorization
-        |--------------------------------------------------------------------------
-        */
-
-        if (!$admin->hasAnyRole($roles)) {
-
-            return response()->json([
-
-                'success' => false,
-
                 'message' => 'You do not have permission to access this resource.',
-
             ], 403);
-
         }
 
         return $next($request);
-
     }
 }

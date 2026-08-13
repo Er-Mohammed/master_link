@@ -14,10 +14,9 @@ class UpdateSiteSettingRequest extends FormRequest
 
     public function rules(): array
     {
-        $siteSetting = $this->route('siteSetting');
+        $siteSetting = $this->route('site_setting');
 
         return [
-
             'key' => [
                 'sometimes',
                 'string',
@@ -48,11 +47,6 @@ class UpdateSiteSettingRequest extends FormRequest
                 'string',
                 'max:100',
             ],
-
-            'is_active' => [
-                'boolean',
-            ],
-
         ];
     }
 }

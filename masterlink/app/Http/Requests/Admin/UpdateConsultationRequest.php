@@ -2,26 +2,34 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Consultation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateConsultationRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized.
+     * Determine whether the admin is authorized
+     * to update the consultation.
      */
     public function authorize(): bool
     {
-        return true;
+        $consultation = $this->route('consultation');
+
+        return $consultation
+            && ($this->user()?->can(
+                'update',
+                $consultation
+            ) ?? false);
     }
 
     /**
-     * Validation Rules.
+     * Get the validation rules that apply
+     * to the request.
      */
     public function rules(): array
     {
         return [
-
             'status' => [
                 'required',
                 'string',
@@ -33,21 +41,20 @@ class UpdateConsultationRequest extends FormRequest
                     'cancelled',
                 ]),
             ],
-
         ];
     }
 
     /**
-     * Custom Validation Messages.
+     * Get custom validation messages.
      */
     public function messages(): array
     {
         return [
+            'status.required' =>
+                'حالة الاستشارة مطلوبة.',
 
-            'status.required' => 'Status is required.',
-
-            'status.in' => 'Invalid consultation status.',
-
+            'status.in' =>
+                'حالة الاستشارة غير صالحة.',
         ];
     }
 }

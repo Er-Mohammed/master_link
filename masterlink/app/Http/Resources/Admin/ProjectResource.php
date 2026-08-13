@@ -9,8 +9,6 @@ class ProjectResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
@@ -27,13 +25,23 @@ class ProjectResource extends JsonResource
             'full_description' => $this->full_description,
 
             'project_url' => $this->project_url,
-            'completion_date' => $this->completion_date?->format('Y-m-d'),
 
-            'is_featured' => $this->is_featured,
+            'completion_date' =>
+                $this->completion_date?->toDateString(),
+
+            'is_featured' => (bool) $this->is_featured,
             'sort_order' => $this->sort_order,
-            'is_active' => $this->is_active,
+            'is_active' => (bool) $this->is_active,
 
-            'category' => $this->whenLoaded('category'),
+            /*
+            |--------------------------------------------------------------------------
+            | Relationships
+            |--------------------------------------------------------------------------
+            */
+
+            'category' => new ProjectCategoryResource(
+                $this->whenLoaded('category')
+            ),
 
             'media' => MediaResource::collection(
                 $this->whenLoaded('media')
@@ -43,8 +51,33 @@ class ProjectResource extends JsonResource
                 $this->whenLoaded('services')
             ),
 
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            /*
+            |--------------------------------------------------------------------------
+            | Counts
+            |--------------------------------------------------------------------------
+            */
+
+            'media_count' => $this->when(
+                isset($this->media_count),
+                $this->media_count
+            ),
+
+            'services_count' => $this->when(
+                isset($this->services_count),
+                $this->services_count
+            ),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Timestamps
+            |--------------------------------------------------------------------------
+            */
+
+            'created_at' =>
+                $this->created_at?->toISOString(),
+
+            'updated_at' =>
+                $this->updated_at?->toISOString(),
         ];
     }
 }

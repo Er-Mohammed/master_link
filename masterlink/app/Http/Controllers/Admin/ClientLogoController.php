@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreClientLogoRequest;
 use App\Http\Requests\Admin\UpdateClientLogoRequest;
+use App\Http\Resources\Admin\ClientLogoResource;
 use App\Models\ClientLogo;
 
 class ClientLogoController extends Controller
@@ -14,29 +15,43 @@ class ClientLogoController extends Controller
      */
     public function index()
     {
-        $logos = ClientLogo::with('media')
+        $this->authorize(
+            'viewAny',
+            ClientLogo::class
+        );
+
+        $logos = ClientLogo::query()
+            ->with('media')
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $logos,
-        ]);
+        return ClientLogoResource::collection(
+            $logos
+        );
     }
 
     /**
      * Store a newly created client logo.
      */
-    public function store(StoreClientLogoRequest $request)
-    {
+    public function store(
+        StoreClientLogoRequest $request
+    ) {
+        $this->authorize(
+            'create',
+            ClientLogo::class
+        );
+
         $logo = ClientLogo::create(
             $request->validated()
         );
 
+        $logo->load('media');
+
         return response()->json([
             'success' => true,
-            'message' => 'Client logo created successfully.',
-            'data' => $logo->load('media'),
+            'message' =>
+                'Client logo created successfully.',
+            'data' => new ClientLogoResource($logo),
         ], 201);
     }
 
@@ -45,9 +60,18 @@ class ClientLogoController extends Controller
      */
     public function show(ClientLogo $clientLogo)
     {
+        $this->authorize(
+            'view',
+            $clientLogo
+        );
+
+        $clientLogo->load('media');
+
         return response()->json([
             'success' => true,
-            'data' => $clientLogo->load('media'),
+            'data' => new ClientLogoResource(
+                $clientLogo
+            ),
         ]);
     }
 
@@ -58,14 +82,26 @@ class ClientLogoController extends Controller
         UpdateClientLogoRequest $request,
         ClientLogo $clientLogo
     ) {
+        $this->authorize(
+            'update',
+            $clientLogo
+        );
+
         $clientLogo->update(
             $request->validated()
         );
 
+        $clientLogo = $clientLogo->fresh();
+
+        $clientLogo->load('media');
+
         return response()->json([
             'success' => true,
-            'message' => 'Client logo updated successfully.',
-            'data' => $clientLogo->fresh()->load('media'),
+            'message' =>
+                'Client logo updated successfully.',
+            'data' => new ClientLogoResource(
+                $clientLogo
+            ),
         ]);
     }
 
@@ -74,11 +110,17 @@ class ClientLogoController extends Controller
      */
     public function destroy(ClientLogo $clientLogo)
     {
+        $this->authorize(
+            'delete',
+            $clientLogo
+        );
+
         $clientLogo->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Client logo deleted successfully.',
+            'message' =>
+                'Client logo deleted successfully.',
         ]);
     }
 }

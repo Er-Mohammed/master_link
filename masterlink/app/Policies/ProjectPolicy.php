@@ -8,76 +8,99 @@ use App\Models\Project;
 class ProjectPolicy
 {
     /**
-     * View any projects.
+     * Determine whether the admin can view any projects.
      */
     public function viewAny(Admin $admin): bool
     {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_MARKETING,
+            ]);
     }
 
     /**
-     * View a specific project.
+     * Determine whether the admin can view a project.
      */
-    public function view(Admin $admin, Project $project): bool
-    {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+    public function view(
+        Admin $admin,
+        Project $project
+    ): bool {
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_MARKETING,
+            ]);
     }
 
     /**
-     * Create a project.
+     * Determine whether the admin can create projects.
      */
     public function create(Admin $admin): bool
     {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_MARKETING,
+            ]);
     }
 
     /**
-     * Update a project.
+     * Determine whether the admin can update a project.
      */
-    public function update(Admin $admin, Project $project): bool
-    {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+    public function update(
+        Admin $admin,
+        Project $project
+    ): bool {
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_MARKETING,
+            ]);
     }
 
     /**
-     * Delete a project.
+     * Determine whether the admin can delete a project.
      */
-    public function delete(Admin $admin, Project $project): bool
-    {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+    public function delete(
+        Admin $admin,
+        Project $project
+    ): bool {
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_MARKETING,
+            ]);
     }
 
     /**
-     * Restore a soft-deleted project.
+     * Determine whether the admin can restore a project.
      */
-    public function restore(Admin $admin, Project $project): bool
-    {
-        return $admin->hasAnyRole([
-            Admin::ROLE_SUPER_ADMIN,
-            Admin::ROLE_MARKETING,
-        ]);
+    public function restore(
+        Admin $admin,
+        Project $project
+    ): bool {
+        return $admin->isActive()
+            && $admin->hasAnyRole([
+                Admin::ROLE_SUPER_ADMIN,
+                Admin::ROLE_ADMIN,
+                Admin::ROLE_MARKETING,
+            ]);
     }
 
     /**
-     * Permanently delete a project.
+     * Determine whether the admin can permanently delete a project.
      */
-    public function forceDelete(Admin $admin, Project $project): bool
-    {
-        return $admin->isSuperAdmin();
+    public function forceDelete(
+        Admin $admin,
+        Project $project
+    ): bool {
+        return $admin->isActive()
+            && $admin->isSuperAdmin();
     }
 }

@@ -8,7 +8,7 @@ use App\Models\ClientLogo;
 class ClientLogoPolicy
 {
     /**
-     * View any client logos.
+     * Determine whether the admin can view any client logos.
      */
     public function viewAny(Admin $admin): bool
     {
@@ -21,10 +21,12 @@ class ClientLogoPolicy
     }
 
     /**
-     * View a specific client logo.
+     * Determine whether the admin can view the client logo.
      */
-    public function view(Admin $admin, ClientLogo $clientLogo): bool
-    {
+    public function view(
+        Admin $admin,
+        ClientLogo $clientLogo
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -34,7 +36,7 @@ class ClientLogoPolicy
     }
 
     /**
-     * Create a client logo.
+     * Determine whether the admin can create client logos.
      */
     public function create(Admin $admin): bool
     {
@@ -47,10 +49,12 @@ class ClientLogoPolicy
     }
 
     /**
-     * Update a client logo.
+     * Determine whether the admin can update the client logo.
      */
-    public function update(Admin $admin, ClientLogo $clientLogo): bool
-    {
+    public function update(
+        Admin $admin,
+        ClientLogo $clientLogo
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -60,10 +64,12 @@ class ClientLogoPolicy
     }
 
     /**
-     * Delete a client logo.
+     * Determine whether the admin can delete the client logo.
      */
-    public function delete(Admin $admin, ClientLogo $clientLogo): bool
-    {
+    public function delete(
+        Admin $admin,
+        ClientLogo $clientLogo
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -73,10 +79,12 @@ class ClientLogoPolicy
     }
 
     /**
-     * Restore a deleted client logo.
+     * Determine whether the admin can restore the client logo.
      */
-    public function restore(Admin $admin, ClientLogo $clientLogo): bool
-    {
+    public function restore(
+        Admin $admin,
+        ClientLogo $clientLogo
+    ): bool {
         return $admin->isActive()
             && $admin->hasAnyRole([
                 Admin::ROLE_SUPER_ADMIN,
@@ -86,14 +94,14 @@ class ClientLogoPolicy
     }
 
     /**
-     * Permanently delete a client logo.
+     * Determine whether the admin can permanently delete
+     * the client logo.
      */
-    public function forceDelete(Admin $admin, ClientLogo $clientLogo): bool
-    {
+    public function forceDelete(
+        Admin $admin,
+        ClientLogo $clientLogo
+    ): bool {
         return $admin->isActive()
-            && $admin->hasAnyRole([
-                Admin::ROLE_SUPER_ADMIN,
-                Admin::ROLE_ADMIN,
-            ]);
+            && $admin->isSuperAdmin();
     }
 }

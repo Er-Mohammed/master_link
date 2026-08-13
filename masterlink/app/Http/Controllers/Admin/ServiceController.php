@@ -8,114 +8,347 @@ use App\Http\Requests\Admin\UpdateServiceRequest;
 use App\Http\Resources\Admin\ServiceResource;
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class ServiceController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of services.
+     *
+     * Supports:
+     * - Pagination
+     * - Filtering
+     * - Searching
+     * - Sorting
+     */
+    public function index(Request $request)
     {
-        Gate::authorize('viewAny', Service::class);
+        $this->authorize(
+            'viewAny',
+            Service::class
+        );
 
-        $services = Service::with('media')
-            ->orderBy('sort_order')
-            ->get();
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
 
-        return ServiceResource::collection($services);
+        $perPage = min(
+            max(
+                (int) $request->input('per_page', 15),
+                1
+            ),
+            100
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query
+        |--------------------------------------------------------------------------
+        */
+
+        $query = Service::query()
+            ->withCount([
+                'media',
+                'projects',
+                'consultations',
+            ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filtering
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('is_active')) {
+            $isActive = filter_var(
+                $request->input('is_active'),
+                FILTER_VALIDATE_BOOLEAN,
+                FILTER_NULL_ON_FAILURE
+            );
+
+            if ($isActive !== null) {
+                $query->where(
+                    'is_active',
+                    $isActive
+                );
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Searching
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+            $search = trim(
+                $request->input('search')
+            );
+
+            $query->where(function ($q) use ($search) {
+                $q->where(
+                    'title',
+                    'like',
+                    "%{$search}%"
+                )
+                    ->orWhere(
+                        'slug',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'short_description',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'full_description',
+                        'like',
+                        "%{$search}%"
+                    );
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+
+        $allowedSorts = [
+            'id',
+            'title',
+            'sort_order',
+            'created_at',
+            'updated_at',
+        ];
+
+        $sort = $request->input(
+            'sort',
+            'sort_order'
+        );
+
+        if (! in_array(
+            $sort,
+            $allowedSorts,
+            true
+        )) {
+            $sort = 'sort_order';
+        }
+
+        $direction = strtolower(
+            $request->input(
+                'direction',
+                'asc'
+            )
+        );
+
+        if (! in_array(
+            $direction,
+            ['asc', 'desc'],
+            true
+        )) {
+            $direction = 'asc';
+        }
+
+        $query->orderBy(
+            $sort,
+            $direction
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination Result
+        |--------------------------------------------------------------------------
+        */
+
+        $services = $query
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return ServiceResource::collection(
+            $services
+        );
     }
 
-    public function store(StoreServiceRequest $request)
-    {
-        Gate::authorize('create', Service::class);
+    /**
+     * Store a newly created service.
+     */
+    public function store(
+        StoreServiceRequest $request
+    ) {
+        $this->authorize(
+            'create',
+            Service::class
+        );
 
         $service = Service::create(
             $request->validated()
         );
 
-        return new ServiceResource(
-            $service->load('media')
-        );
+        return response()->json([
+            'success' => true,
+            'message' => 'Service created successfully.',
+            'data' => new ServiceResource(
+                $service
+            ),
+        ], 201);
     }
 
+    /**
+     * Display the specified service.
+     */
     public function show(Service $service)
     {
-        Gate::authorize('view', $service);
+        $this->authorize(
+            'view',
+            $service
+        );
 
-        $service->load('media');
+        $service->load([
+            'media',
+            'projects',
+            'consultations',
+        ]);
 
-        return new ServiceResource($service);
+        $service->loadCount([
+            'media',
+            'projects',
+            'consultations',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => new ServiceResource(
+                $service
+            ),
+        ]);
     }
 
+    /**
+     * Update the specified service.
+     */
     public function update(
         UpdateServiceRequest $request,
         Service $service
     ) {
-        Gate::authorize('update', $service);
+        $this->authorize(
+            'update',
+            $service
+        );
 
         $service->update(
             $request->validated()
         );
 
-        return new ServiceResource(
-            $service->fresh()->load('media')
-        );
+        $service->load([
+            'media',
+            'projects',
+            'consultations',
+        ]);
+
+        $service->loadCount([
+            'media',
+            'projects',
+            'consultations',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Service updated successfully.',
+            'data' => new ServiceResource(
+                $service
+            ),
+        ]);
     }
 
+    /**
+     * Remove the specified service.
+     */
     public function destroy(Service $service)
     {
-        Gate::authorize('delete', $service);
+        $this->authorize(
+            'delete',
+            $service
+        );
 
         $service->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Service deleted successfully',
+            'message' => 'Service deleted successfully.',
         ]);
     }
 
+    /**
+     * Attach media to a service.
+     */
     public function attachMedia(
         Request $request,
         Service $service
     ) {
-        Gate::authorize('update', $service);
+        $this->authorize(
+            'update',
+            $service
+        );
 
         $validated = $request->validate([
-            'media' => [
+            'media_id' => [
                 'required',
-                'array',
-            ],
-            'media.*.id' => [
-                'required',
+                'integer',
                 'exists:media,id',
             ],
-            'media.*.sort_order' => [
+
+            'sort_order' => [
                 'nullable',
                 'integer',
+                'min:0',
             ],
         ]);
 
-        foreach ($validated['media'] as $item) {
-            $service->media()->syncWithoutDetaching([
-                $item['id'] => [
-                    'sort_order' => $item['sort_order'] ?? 0,
-                ],
-            ]);
-        }
+        $service->media()->syncWithoutDetaching([
+            $validated['media_id'] => [
+                'sort_order' =>
+                    $validated['sort_order'] ?? 0,
+            ],
+        ]);
 
-        return new ServiceResource(
-            $service->load('media')
-        );
+        $service->load('media');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Media attached successfully.',
+            'data' => new ServiceResource(
+                $service
+            ),
+        ]);
     }
 
+    /**
+     * Detach media from a service.
+     */
     public function detachMedia(
         Service $service,
-        $media
+        int $media
     ) {
-        Gate::authorize('update', $service);
-
-        $service->media()->detach($media);
-
-        return new ServiceResource(
-            $service->load('media')
+        $this->authorize(
+            'update',
+            $service
         );
+
+        $service->media()->detach(
+            $media
+        );
+
+        $service->load('media');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Media detached successfully.',
+            'data' => new ServiceResource(
+                $service
+            ),
+        ]);
     }
 }

@@ -12,7 +12,9 @@ class Service extends Model
 {
     use HasFactory, SoftDeletes;
 
-
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'title',
         'slug',
@@ -22,15 +24,16 @@ class Service extends Model
         'is_active',
     ];
 
-
+    /**
+     * The attributes that should be cast.
+     */
     protected $casts = [
         'is_active' => 'boolean',
+        'sort_order' => 'integer',
     ];
 
-
-
     /**
-     * Media attached to service
+     * Media attached to the service.
      */
     public function media(): BelongsToMany
     {
@@ -40,15 +43,13 @@ class Service extends Model
             'service_id',
             'media_id'
         )
-        ->withPivot('sort_order')
-        ->withTimestamps()
-        ->orderBy('service_media.sort_order');
+            ->withPivot('sort_order')
+            ->withTimestamps()
+            ->orderBy('service_media.sort_order');
     }
 
-
-
     /**
-     * Projects related to service
+     * Projects related to the service.
      */
     public function projects(): BelongsToMany
     {
@@ -58,13 +59,11 @@ class Service extends Model
             'service_id',
             'project_id'
         )
-        ->withTimestamps();
+            ->withTimestamps();
     }
 
-
-
     /**
-     * Consultation requests
+     * Consultation requests related to the service.
      */
     public function consultations(): HasMany
     {

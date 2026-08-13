@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Consultation extends Model
 {
@@ -19,12 +20,13 @@ class Consultation extends Model
         'status',
     ];
 
-
     /**
-     * الخدمة المطلوبة في الاستشارة
+     * Service requested by the client.
      */
-    public function service()
+    public function service(): BelongsTo
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(
+            Service::class
+        );
     }
 }

@@ -2,26 +2,32 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
 {
+    /**
+     * Determine whether the authenticated admin
+     * is authorized to create a post.
+     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can(
+            'create',
+            Post::class
+        ) ?? false;
     }
 
+    /**
+     * Get the validation rules.
+     */
     public function rules(): array
     {
         return [
-
-            'admin_id' => [
-                'nullable',
-                'exists:admins,id',
-            ],
-
             'media_id' => [
                 'nullable',
+                'integer',
                 'exists:media,id',
             ],
 
@@ -44,7 +50,7 @@ class StorePostRequest extends FormRequest
             ],
 
             'content' => [
-                'nullable',
+                'required',
                 'string',
             ],
 
@@ -54,13 +60,14 @@ class StorePostRequest extends FormRequest
             ],
 
             'is_featured' => [
+                'sometimes',
                 'boolean',
             ],
 
             'is_active' => [
+                'sometimes',
                 'boolean',
             ],
-
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
@@ -29,18 +30,22 @@ class Post extends Model
     ];
 
     /**
-     * الكاتب الذي أنشأ المقال
+     * The admin who created the post.
      */
-    public function admin()
+    public function admin(): BelongsTo
     {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(
+            Admin::class
+        );
     }
 
     /**
-     * الصورة الرئيسية للمقال
+     * The main media associated with the post.
      */
-    public function media()
+    public function media(): BelongsTo
     {
-        return $this->belongsTo(Media::class);
+        return $this->belongsTo(
+            Media::class
+        );
     }
 }
