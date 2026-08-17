@@ -22,8 +22,11 @@ class Admin extends Authenticatable
     */
 
     public const ROLE_SUPER_ADMIN = 'super_admin';
+
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_CONTENT_MANAGER = 'content_manager';
+
     public const ROLE_MARKETING = 'marketing';
 
     /*
@@ -104,21 +107,29 @@ class Admin extends Authenticatable
 
     public function isSuperAdmin(): bool
     {
-        return $this->hasRole(self::ROLE_SUPER_ADMIN);
+        return $this->hasRole(
+            self::ROLE_SUPER_ADMIN
+        );
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasRole(self::ROLE_ADMIN);
+        return $this->hasRole(
+            self::ROLE_ADMIN
+        );
     }
 
     public function isContentManager(): bool
     {
-        return $this->hasRole(self::ROLE_CONTENT_MANAGER);
+        return $this->hasRole(
+            self::ROLE_CONTENT_MANAGER
+        );
     }
 
     public function isMarketing(): bool
     {
-        return $this->hasRole(self::ROLE_MARKETING);
+        return $this->hasRole(
+            self::ROLE_MARKETING
+        );
     }
 }

@@ -22,8 +22,8 @@ Route::prefix('admin')
         | Authentication
         |--------------------------------------------------------------------------
         */
-
         Route::post('login', [AuthController::class, 'login'])
+            ->middleware('throttle:admin-login')
             ->name('login');
 
         /*

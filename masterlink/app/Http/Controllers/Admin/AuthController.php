@@ -20,8 +20,9 @@ class AuthController extends Controller
     /**
      * Login admin.
      */
-    public function login(LoginRequest $request): JsonResponse
-    {
+    public function login(
+        LoginRequest $request
+    ): JsonResponse {
         $result = $this->authService->login(
             $request->validated()
         );
@@ -29,16 +30,21 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'تم تسجيل الدخول بنجاح.',
-            'token' => $result['token'],
-            'admin' => new AuthResource($result['admin']),
+            'data' => [
+                'token' => $result['token'],
+                'admin' => new AuthResource(
+                    $result['admin']
+                ),
+            ],
         ]);
     }
 
     /**
      * Get authenticated admin.
      */
-    public function me(Request $request): JsonResponse
-    {
+    public function me(
+        Request $request
+    ): JsonResponse {
         return response()->json([
             'success' => true,
             'data' => new AuthResource(
@@ -50,8 +56,9 @@ class AuthController extends Controller
     /**
      * Logout admin.
      */
-    public function logout(Request $request): JsonResponse
-    {
+    public function logout(
+        Request $request
+    ): JsonResponse {
         $this->authService->logout(
             $request->user()
         );
@@ -77,7 +84,9 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'تم تغيير كلمة المرور بنجاح.',
-            'token' => $token,
+            'data' => [
+                'token' => $token,
+            ],
         ]);
     }
 }
