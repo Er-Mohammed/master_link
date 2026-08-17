@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 class StoreMediaRequest extends FormRequest
 {
@@ -31,14 +31,18 @@ class StoreMediaRequest extends FormRequest
                 'required',
                 'file',
                 'max:10240',
-            ],
 
-            'media_type' => [
-                'required',
-                Rule::in([
-                    'image',
-                    'video',
-                    'document',
+                File::types([
+                    'jpg',
+                    'jpeg',
+                    'png',
+                    'webp',
+                    'mp4',
+                    'webm',
+                    'mov',
+                    'pdf',
+                    'doc',
+                    'docx',
                 ]),
             ],
 
@@ -48,6 +52,44 @@ class StoreMediaRequest extends FormRequest
                 'max:255',
             ],
         ];
+    }
+
+    /**
+     * Get the media type based on the validated file.
+     */
+    public function mediaType(): string
+    {
+        $file = $this->file('file');
+
+        $extension = strtolower(
+            $file->extension()
+        );
+
+        return match (true) {
+
+            in_array($extension, [
+                'jpg',
+                'jpeg',
+                'png',
+                'webp',
+            ], true) => 'image',
+
+            in_array($extension, [
+                'mp4',
+                'webm',
+                'mov',
+            ], true) => 'video',
+
+            in_array($extension, [
+                'pdf',
+                'doc',
+                'docx',
+            ], true) => 'document',
+
+            default => throw new \RuntimeException(
+                'Unsupported media type.'
+            ),
+        };
     }
 
     /**
@@ -65,11 +107,8 @@ class StoreMediaRequest extends FormRequest
             'file.max' =>
                 'حجم الملف يجب ألا يتجاوز 10 ميجابايت.',
 
-            'media_type.required' =>
-                'نوع الوسائط مطلوب.',
-
-            'media_type.in' =>
-                'نوع الوسائط يجب أن يكون image أو video أو document.',
+            'file.types' =>
+                'نوع الملف غير مسموح به.',
 
             'alt_text.string' =>
                 'النص البديل يجب أن يكون نصاً.',

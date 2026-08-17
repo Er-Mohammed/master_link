@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateAdminRequest;
 use App\Http\Resources\Admin\AdminResource;
 use App\Models\Admin;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -17,7 +18,10 @@ class AdminController extends Controller
      */
     public function index(): JsonResponse
     {
-        $this->authorize('viewAny', Admin::class);
+        $this->authorize(
+            'viewAny',
+            Admin::class
+        );
 
         $admins = Admin::query()
             ->select([
@@ -41,9 +45,13 @@ class AdminController extends Controller
     /**
      * Store a newly created admin.
      */
-    public function store(StoreAdminRequest $request): JsonResponse
-    {
-        $this->authorize('create', Admin::class);
+    public function store(
+        StoreAdminRequest $request
+    ): JsonResponse {
+        $this->authorize(
+            'create',
+            Admin::class
+        );
 
         $validated = $request->validated();
 
@@ -51,7 +59,9 @@ class AdminController extends Controller
             $validated['password']
         );
 
-        $admin = Admin::create($validated);
+        $admin = DB::transaction(
+            fn () => Admin::create($validated)
+        );
 
         return response()->json([
             'success' => true,
@@ -63,9 +73,13 @@ class AdminController extends Controller
     /**
      * Display the specified admin.
      */
-    public function show(Admin $admin): JsonResponse
-    {
-        $this->authorize('view', $admin);
+    public function show(
+        Admin $admin
+    ): JsonResponse {
+        $this->authorize(
+            'view',
+            $admin
+        );
 
         return response()->json([
             'success' => true,
@@ -80,19 +94,61 @@ class AdminController extends Controller
         UpdateAdminRequest $request,
         Admin $admin
     ): JsonResponse {
-        $this->authorize('update', $admin);
+        $this->authorize(
+            'update',
+            $admin
+        );
 
         $validated = $request->validated();
 
-        if (! empty($validated['password'])) {
+        $passwordChanged = false;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Password
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            isset($validated['password'])
+            && filled($validated['password'])
+        ) {
             $validated['password'] = Hash::make(
                 $validated['password']
             );
+
+            $passwordChanged = true;
         } else {
             unset($validated['password']);
         }
 
-        $admin->update($validated);
+        /*
+        |--------------------------------------------------------------------------
+        | Update Admin
+        |--------------------------------------------------------------------------
+        */
+
+        DB::transaction(function () use (
+            $admin,
+            $validated,
+            $passwordChanged
+        ) {
+            $admin->update($validated);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Revoke Existing Tokens
+            |--------------------------------------------------------------------------
+            |
+            | If the Super Admin changes another admin's password,
+            | all existing authentication tokens become invalid.
+            |
+            */
+
+            if ($passwordChanged) {
+                $admin->tokens()->delete();
+            }
+        });
 
         return response()->json([
             'success' => true,
@@ -106,11 +162,32 @@ class AdminController extends Controller
     /**
      * Remove the specified admin.
      */
-    public function destroy(Admin $admin): JsonResponse
-    {
-        $this->authorize('delete', $admin);
+    public function destroy(
+        Admin $admin
+    ): JsonResponse {
+        $this->authorize(
+            'delete',
+            $admin
+        );
 
-        $admin->delete();
+        DB::transaction(function () use ($admin) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Revoke all authentication tokens.
+            |--------------------------------------------------------------------------
+            */
+
+            $admin->tokens()->delete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Soft delete the admin.
+            |--------------------------------------------------------------------------
+            */
+
+            $admin->delete();
+        });
 
         return response()->json([
             'success' => true,

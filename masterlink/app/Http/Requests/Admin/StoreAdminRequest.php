@@ -17,7 +17,6 @@ class StoreAdminRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'name' => [
                 'required',
                 'string',
@@ -48,9 +47,9 @@ class StoreAdminRequest extends FormRequest
             ],
 
             'is_active' => [
+                'sometimes',
                 'boolean',
             ],
-
         ];
     }
 }

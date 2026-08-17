@@ -13,8 +13,12 @@ class AuthService
      */
     public function login(array $data): array
     {
+        $email = strtolower(
+            trim($data['email'])
+        );
+
         $admin = Admin::query()
-            ->where('email', strtolower(trim($data['email'])))
+            ->where('email', $email)
             ->first();
 
         if (! $admin) {
@@ -29,7 +33,12 @@ class AuthService
             ]);
         }
 
-        if (! Hash::check($data['password'], $admin->password)) {
+        if (
+            ! Hash::check(
+                $data['password'],
+                $admin->password
+            )
+        ) {
             throw ValidationException::withMessages([
                 'email' => 'بيانات الدخول غير صحيحة.',
             ]);
@@ -58,7 +67,9 @@ class AuthService
      */
     public function logout(Admin $admin): void
     {
-        $admin->currentAccessToken()?->delete();
+        $admin
+            ->currentAccessToken()
+            ?->delete();
     }
 
     /**
@@ -69,18 +80,27 @@ class AuthService
         string $currentPassword,
         string $newPassword
     ): string {
-        if (! Hash::check($currentPassword, $admin->password)) {
+        if (
+            ! Hash::check(
+                $currentPassword,
+                $admin->password
+            )
+        ) {
             throw ValidationException::withMessages([
-                'current_password' => 'كلمة المرور الحالية غير صحيحة.',
+                'current_password' =>
+                    'كلمة المرور الحالية غير صحيحة.',
             ]);
         }
 
-        $admin->password = $newPassword;
+        $admin->password = Hash::make(
+            $newPassword
+        );
+
         $admin->save();
 
         /*
         |--------------------------------------------------------------------------
-        | Revoke All Existing Tokens
+        | Revoke Existing Tokens
         |--------------------------------------------------------------------------
         */
 

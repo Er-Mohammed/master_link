@@ -2,9 +2,12 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Admin;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
-class StoreTestimonialRequest extends FormRequest
+class UpdateAdminRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -13,47 +16,49 @@ class StoreTestimonialRequest extends FormRequest
 
     public function rules(): array
     {
+        $targetAdmin = $this->route('admin');
+
         return [
-
-            'media_id' => [
-                'nullable',
-                'exists:media,id',
-            ],
-
-            'display_name' => [
-                'required',
+            'name' => [
+                'sometimes',
                 'string',
                 'max:150',
             ],
 
-            'message' => [
-                'required',
-                'string',
+            'email' => [
+                'sometimes',
+                'email',
+                'max:150',
+
+                Rule::unique(
+                    'admins',
+                    'email'
+                )->ignore(
+                    $targetAdmin?->id
+                ),
             ],
 
-            'sort_order' => [
+            'password' => [
+                'sometimes',
                 'nullable',
-                'integer',
+                'string',
+                Password::defaults(),
+            ],
+
+            'role' => [
+                'sometimes',
+                Rule::in([
+                    Admin::ROLE_SUPER_ADMIN,
+                    Admin::ROLE_ADMIN,
+                    Admin::ROLE_CONTENT_MANAGER,
+                    Admin::ROLE_MARKETING,
+                ]),
             ],
 
             'is_active' => [
-                'nullable',
+                'sometimes',
                 'boolean',
             ],
-
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-
-            'display_name.required' => 'Display name is required.',
-
-            'message.required' => 'Message is required.',
-
-            'media_id.exists' => 'Selected media does not exist.',
-
         ];
     }
 }

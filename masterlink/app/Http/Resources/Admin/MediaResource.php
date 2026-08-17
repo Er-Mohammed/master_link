@@ -24,10 +24,6 @@ class MediaResource extends JsonResource
 
             'file_size' => $this->file_size,
 
-            'width' => $this->width,
-
-            'height' => $this->height,
-
             'alt_text' => $this->alt_text,
 
             'sort_order' => $this->pivot?->sort_order,

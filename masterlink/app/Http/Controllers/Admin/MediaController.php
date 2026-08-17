@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreMediaRequest;
 use App\Http\Requests\Admin\UpdateMediaRequest;
 use App\Http\Resources\Admin\MediaResource;
 use App\Models\Media;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,12 +19,15 @@ class MediaController extends Controller
      * Supports:
      * - Pagination
      * - Filtering by media_type
-     * - Searching by file_name, extension, mime_type, alt_text
-     * - Sorting by allowed columns
+     * - Searching
+     * - Sorting
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $this->authorize('viewAny', Media::class);
+        $this->authorize(
+            'viewAny',
+            Media::class
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -61,7 +65,10 @@ class MediaController extends Controller
                 ['image', 'video', 'document'],
                 true
             )) {
-                $query->where('media_type', $mediaType);
+                $query->where(
+                    'media_type',
+                    $mediaType
+                );
             }
         }
 
@@ -158,38 +165,83 @@ class MediaController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        return MediaResource::collection($media);
+        return response()->json([
+            'success' => true,
+            'data' => MediaResource::collection($media),
+        ]);
     }
 
     /**
      * Store a newly uploaded media file.
      */
-    public function store(StoreMediaRequest $request)
-    {
+    public function store(
+        StoreMediaRequest $request
+    ): JsonResponse {
         $this->authorize(
             'create',
             Media::class
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Uploaded File
+        |--------------------------------------------------------------------------
+        */
+
         $file = $request->file('file');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Determine Media Type
+        |--------------------------------------------------------------------------
+        */
+
+        $mediaType = $request->mediaType();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Store File
+        |--------------------------------------------------------------------------
+        */
 
         $path = $file->store(
             'media',
             'public'
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Create Media Record
+        |--------------------------------------------------------------------------
+        */
+
         $media = Media::create([
             'admin_id' => $request->user()->id,
+
             'file_name' => $file->getClientOriginalName(),
+
             'file_path' => $path,
-            'extension' => $file->getClientOriginalExtension(),
-            'media_type' => $request->validated('media_type'),
+
+            'extension' => strtolower(
+                $file->extension()
+            ),
+
+            'media_type' => $mediaType,
+
             'mime_type' => $file->getMimeType(),
+
             'file_size' => $file->getSize(),
-            'width' => $this->getImageWidth($file),
-            'height' => $this->getImageHeight($file),
-            'alt_text' => $request->validated('alt_text'),
+
+            'alt_text' => $request->validated(
+                'alt_text'
+            ),
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Response
+        |--------------------------------------------------------------------------
+        */
 
         return response()->json([
             'success' => true,
@@ -201,8 +253,9 @@ class MediaController extends Controller
     /**
      * Display the specified media.
      */
-    public function show(Media $medium)
-    {
+    public function show(
+        Media $medium
+    ): JsonResponse {
         $this->authorize(
             'view',
             $medium
@@ -220,7 +273,7 @@ class MediaController extends Controller
     public function update(
         UpdateMediaRequest $request,
         Media $medium
-    ) {
+    ): JsonResponse {
         $this->authorize(
             'update',
             $medium
@@ -242,12 +295,19 @@ class MediaController extends Controller
     /**
      * Remove the specified media.
      */
-    public function destroy(Media $medium)
-    {
+    public function destroy(
+        Media $medium
+    ): JsonResponse {
         $this->authorize(
             'delete',
             $medium
         );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Physical File
+        |--------------------------------------------------------------------------
+        */
 
         if (
             $medium->file_path &&
@@ -260,49 +320,17 @@ class MediaController extends Controller
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Soft Delete Database Record
+        |--------------------------------------------------------------------------
+        */
+
         $medium->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Media deleted successfully.',
         ]);
-    }
-
-    /**
-     * Get image width.
-     */
-    private function getImageWidth($file): ?int
-    {
-        if (! str_starts_with(
-            $file->getMimeType() ?? '',
-            'image/'
-        )) {
-            return null;
-        }
-
-        $dimensions = @getimagesize(
-            $file->getRealPath()
-        );
-
-        return $dimensions[0] ?? null;
-    }
-
-    /**
-     * Get image height.
-     */
-    private function getImageHeight($file): ?int
-    {
-        if (! str_starts_with(
-            $file->getMimeType() ?? '',
-            'image/'
-        )) {
-            return null;
-        }
-
-        $dimensions = @getimagesize(
-            $file->getRealPath()
-        );
-
-        return $dimensions[1] ?? null;
     }
 }

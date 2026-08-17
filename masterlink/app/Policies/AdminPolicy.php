@@ -18,8 +18,10 @@ class AdminPolicy
     /**
      * View a specific admin.
      */
-    public function view(Admin $admin, Admin $targetAdmin): bool
-    {
+    public function view(
+        Admin $admin,
+        Admin $targetAdmin
+    ): bool {
         return $admin->isActive()
             && $admin->isSuperAdmin();
     }
@@ -49,13 +51,12 @@ class AdminPolicy
 
         /*
         |--------------------------------------------------------------------------
-        | Super Admin can update himself,
-        | but cannot deactivate or change his own role.
+        | Super Admin cannot update himself through Admin Management.
         |--------------------------------------------------------------------------
         */
 
         if ($admin->id === $targetAdmin->id) {
-            return true;
+            return false;
         }
 
         return true;
@@ -75,18 +76,29 @@ class AdminPolicy
             return false;
         }
 
-        // Super Admin cannot delete himself.
+        /*
+        |--------------------------------------------------------------------------
+        | Cannot delete yourself.
+        |--------------------------------------------------------------------------
+        */
+
         if ($admin->id === $targetAdmin->id) {
             return false;
         }
 
-        // Cannot delete the last Super Admin.
+        /*
+        |--------------------------------------------------------------------------
+        | Cannot delete the last Super Admin.
+        |--------------------------------------------------------------------------
+        */
+
         if (
             $targetAdmin->isSuperAdmin()
-            && Admin::where(
-                'role',
-                Admin::ROLE_SUPER_ADMIN
-            )
+            && Admin::query()
+                ->where(
+                    'role',
+                    Admin::ROLE_SUPER_ADMIN
+                )
                 ->where(
                     'id',
                     '!=',
@@ -131,10 +143,11 @@ class AdminPolicy
 
         if (
             $targetAdmin->isSuperAdmin()
-            && Admin::where(
-                'role',
-                Admin::ROLE_SUPER_ADMIN
-            )
+            && Admin::query()
+                ->where(
+                    'role',
+                    Admin::ROLE_SUPER_ADMIN
+                )
                 ->where(
                     'id',
                     '!=',

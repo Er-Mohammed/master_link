@@ -15,7 +15,10 @@ class UpdateMediaRequest extends FormRequest
         $media = $this->route('medium');
 
         return $media
-            && ($this->user()?->can('update', $media) ?? false);
+            && ($this->user()?->can(
+                'update',
+                $media
+            ) ?? false);
     }
 
     /**
@@ -31,11 +34,6 @@ class UpdateMediaRequest extends FormRequest
                 'string',
                 'max:255',
             ],
-
-            'media_type' => [
-                'sometimes',
-                'in:image,video,document',
-            ],
         ];
     }
 
@@ -50,9 +48,6 @@ class UpdateMediaRequest extends FormRequest
 
             'alt_text.max' =>
                 'النص البديل يجب ألا يتجاوز 255 حرفاً.',
-
-            'media_type.in' =>
-                'نوع الوسائط يجب أن يكون image أو video أو document.',
         ];
     }
 }
