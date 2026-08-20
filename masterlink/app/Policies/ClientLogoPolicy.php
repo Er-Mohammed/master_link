@@ -77,31 +77,4 @@ class ClientLogoPolicy
                 Admin::ROLE_MARKETING,
             ]);
     }
-
-    /**
-     * Determine whether the admin can restore the client logo.
-     */
-    public function restore(
-        Admin $admin,
-        ClientLogo $clientLogo
-    ): bool {
-        return $admin->isActive()
-            && $admin->hasAnyRole([
-                Admin::ROLE_SUPER_ADMIN,
-                Admin::ROLE_ADMIN,
-                Admin::ROLE_MARKETING,
-            ]);
-    }
-
-    /**
-     * Determine whether the admin can permanently delete
-     * the client logo.
-     */
-    public function forceDelete(
-        Admin $admin,
-        ClientLogo $clientLogo
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
 }

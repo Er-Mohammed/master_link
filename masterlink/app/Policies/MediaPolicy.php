@@ -77,30 +77,4 @@ class MediaPolicy
                 Admin::ROLE_CONTENT_MANAGER,
             ]);
     }
-
-    /**
-     * Determine whether the admin can restore the media.
-     */
-    public function restore(
-        Admin $admin,
-        Media $media
-    ): bool {
-        return $admin->isActive()
-            && $admin->hasAnyRole([
-                Admin::ROLE_SUPER_ADMIN,
-                Admin::ROLE_ADMIN,
-                Admin::ROLE_CONTENT_MANAGER,
-            ]);
-    }
-
-    /**
-     * Determine whether the admin can permanently delete media.
-     */
-    public function forceDelete(
-        Admin $admin,
-        Media $media
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
 }

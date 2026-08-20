@@ -75,26 +75,4 @@ class ConsultationPolicy
                 Admin::ROLE_MARKETING,
             ]);
     }
-
-    /**
-     * Restore is not currently used because
-     * Consultation does not use SoftDeletes.
-     */
-    public function restore(
-        Admin $admin,
-        Consultation $consultation
-    ): bool {
-        return false;
-    }
-
-    /**
-     * Permanently delete a consultation.
-     */
-    public function forceDelete(
-        Admin $admin,
-        Consultation $consultation
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
 }

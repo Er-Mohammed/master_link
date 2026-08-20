@@ -322,7 +322,7 @@ class MediaController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Soft Delete Database Record
+        | Delete Database Record
         |--------------------------------------------------------------------------
         */
 
