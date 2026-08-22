@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProjectRequest;
+use App\Http\Requests\Admin\SyncProjectMediaRequest;
+use App\Http\Requests\Admin\SyncProjectServicesRequest;
 use App\Http\Requests\Admin\UpdateProjectRequest;
 use App\Http\Resources\Admin\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
@@ -262,6 +265,78 @@ class ProjectController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Project deleted successfully.',
+        ]);
+    }
+
+    /**
+     * Synchronize media associated with the project.
+     */
+    public function syncMedia(
+        SyncProjectMediaRequest $request,
+        Project $project
+    ) {
+        $this->authorize(
+            'update',
+            $project
+        );
+
+        DB::transaction(function () use ($request, $project) {
+            $project->media()->sync(
+                $request->getNormalizedMediaData()
+            );
+        });
+
+        $project->load([
+            'category',
+            'media',
+            'services',
+        ]);
+
+        $project->loadCount([
+            'media',
+            'services',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Project media synchronized successfully.',
+            'data' => new ProjectResource($project),
+        ]);
+    }
+
+    /**
+     * Synchronize services associated with the project.
+     */
+    public function syncServices(
+        SyncProjectServicesRequest $request,
+        Project $project
+    ) {
+        $this->authorize(
+            'update',
+            $project
+        );
+
+        DB::transaction(function () use ($request, $project) {
+            $project->services()->sync(
+                $request->validated('services')
+            );
+        });
+
+        $project->load([
+            'category',
+            'media',
+            'services',
+        ]);
+
+        $project->loadCount([
+            'media',
+            'services',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Project services synchronized successfully.',
+            'data' => new ProjectResource($project),
         ]);
     }
 }

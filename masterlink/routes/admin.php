@@ -46,6 +46,12 @@ Route::prefix('admin')
             Route::get('me', [AuthController::class, 'me'])
                 ->name('me');
 
+            Route::match(['put', 'patch', 'post'], 'me', [AuthController::class, 'updateProfile'])
+                ->name('me.update');
+
+            Route::match(['put', 'patch', 'post'], 'profile', [AuthController::class, 'updateProfile'])
+                ->name('profile.update');
+
             Route::post('logout', [AuthController::class, 'logout'])
                 ->name('logout');
 
@@ -85,6 +91,14 @@ Route::prefix('admin')
 
             Route::apiResource('projects', ProjectController::class)
                 ->middleware('role:super_admin,admin,marketing');
+
+            Route::put('projects/{project}/media', [ProjectController::class, 'syncMedia'])
+                ->middleware('role:super_admin,admin,marketing')
+                ->name('projects.media.sync');
+
+            Route::put('projects/{project}/services', [ProjectController::class, 'syncServices'])
+                ->middleware('role:super_admin,admin,marketing')
+                ->name('projects.services.sync');
 
             /*
             |--------------------------------------------------------------------------

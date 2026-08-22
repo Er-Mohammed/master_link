@@ -39,6 +39,7 @@ class Admin extends Authenticatable
         'password',
         'role',
         'is_active',
+        'profile_media_id',
     ];
 
     /*
@@ -71,6 +72,11 @@ class Admin extends Authenticatable
     | Relationships
     |--------------------------------------------------------------------------
     */
+
+    public function profileMedia()
+    {
+        return $this->belongsTo(Media::class, 'profile_media_id');
+    }
 
     public function media()
     {
