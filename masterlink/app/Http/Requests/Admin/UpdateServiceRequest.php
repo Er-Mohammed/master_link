@@ -34,13 +34,13 @@ class UpdateServiceRequest extends FormRequest
             'title' => [
                 'sometimes',
                 'string',
-                'max:255',
+                'max:150',
             ],
 
             'slug' => [
                 'sometimes',
                 'string',
-                'max:255',
+                'max:180',
                 Rule::unique(
                     'services',
                     'slug'

@@ -2,13 +2,15 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Testimonial;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTestimonialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $testimonial = $this->route('testimonial');
+        return $testimonial && ($this->user()?->can('update', $testimonial) ?? false);
     }
 
     public function rules(): array

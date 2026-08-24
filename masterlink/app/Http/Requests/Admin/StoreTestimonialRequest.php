@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Testimonial;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTestimonialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Testimonial::class) ?? false;
     }
 
     public function rules(): array

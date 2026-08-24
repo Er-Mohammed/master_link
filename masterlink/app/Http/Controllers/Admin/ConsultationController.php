@@ -6,31 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateConsultationRequest;
 use App\Http\Resources\Admin\ConsultationResource;
 use App\Models\Consultation;
+use App\Services\Exports\ConsultationsExcelExport;
+use App\Services\Exports\ConsultationsPdfExport;
 use Illuminate\Http\Request;
 
 class ConsultationController extends Controller
 {
     /**
-     * Display a listing of consultations.
+     * Build filtered query for consultations listing and exports.
      */
-    public function index(Request $request)
+    protected function buildFilteredQuery(Request $request)
     {
-        $this->authorize('viewAny', Consultation::class);
-
-        $perPage = min(
-            max((int) $request->input('per_page', 15), 1),
-            100
-        );
-
-        $query = Consultation::query()
-            ->with('service');
+        $query = Consultation::query()->with('service');
 
         /*
         |--------------------------------------------------------------------------
         | Filter by status
         |--------------------------------------------------------------------------
         */
-
         if ($request->filled('status')) {
             $allowedStatuses = [
                 'new',
@@ -52,12 +45,8 @@ class ConsultationController extends Controller
         | Filter by service
         |--------------------------------------------------------------------------
         */
-
         if ($request->filled('service_id')) {
-            $query->where(
-                'service_id',
-                $request->input('service_id')
-            );
+            $query->where('service_id', $request->input('service_id'));
         }
 
         /*
@@ -65,38 +54,15 @@ class ConsultationController extends Controller
         | Search
         |--------------------------------------------------------------------------
         */
-
         if ($request->filled('search')) {
-            $search = trim(
-                $request->input('search')
-            );
+            $search = trim($request->input('search'));
 
             $query->where(function ($q) use ($search) {
-                $q->where(
-                    'name',
-                    'like',
-                    "%{$search}%"
-                )
-                    ->orWhere(
-                        'email',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'phone',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'company_name',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'message',
-                        'like',
-                        "%{$search}%"
-                    );
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('company_name', 'like', "%{$search}%")
+                    ->orWhere('message', 'like', "%{$search}%");
             });
         }
 
@@ -105,7 +71,6 @@ class ConsultationController extends Controller
         | Sorting
         |--------------------------------------------------------------------------
         */
-
         $allowedSorts = [
             'id',
             'name',
@@ -115,68 +80,94 @@ class ConsultationController extends Controller
             'updated_at',
         ];
 
-        $sort = $request->input(
-            'sort',
-            'created_at'
-        );
+        $sort = $request->input('sort', 'created_at');
 
         if (! in_array($sort, $allowedSorts, true)) {
             $sort = 'created_at';
         }
 
-        $direction = strtolower(
-            $request->input(
-                'direction',
-                'desc'
-            )
-        );
+        $direction = strtolower($request->input('direction', 'desc'));
 
-        if (! in_array(
-            $direction,
-            ['asc', 'desc'],
-            true
-        )) {
+        if (! in_array($direction, ['asc', 'desc'], true)) {
             $direction = 'desc';
         }
 
-        $query->orderBy(
-            $sort,
-            $direction
+        $query->orderBy($sort, $direction);
+
+        return $query;
+    }
+
+    /**
+     * Display a listing of consultations.
+     */
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', Consultation::class);
+
+        $perPage = min(
+            max((int) $request->input('per_page', 15), 1),
+            100
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Pagination
-        |--------------------------------------------------------------------------
-        */
+        $query = $this->buildFilteredQuery($request);
 
         $consultations = $query
             ->paginate($perPage)
             ->withQueryString();
 
-        return ConsultationResource::collection(
-            $consultations
-        );
+        return ConsultationResource::collection($consultations);
+    }
+
+    /**
+     * Export consultations to Excel (.xlsx).
+     */
+    public function exportExcel(Request $request)
+    {
+        $this->authorize('viewAny', Consultation::class);
+
+        $query = $this->buildFilteredQuery($request);
+        $binary = ConsultationsExcelExport::generate($query);
+
+        $fileName = 'masterlink-consultations-' . now()->format('Y-m-d') . '.xlsx';
+
+        return response($binary, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Cache-Control' => 'max-age=0',
+        ]);
+    }
+
+    /**
+     * Export consultations to PDF (.pdf).
+     */
+    public function exportPdf(Request $request)
+    {
+        $this->authorize('viewAny', Consultation::class);
+
+        $query = $this->buildFilteredQuery($request);
+        $binary = ConsultationsPdfExport::generate($query, $request);
+
+        $fileName = 'masterlink-consultations-' . now()->format('Y-m-d') . '.pdf';
+
+        return response($binary, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
 
     /**
      * Display the specified consultation.
      */
-    public function show(
-        Consultation $consultation
-    ) {
-        $this->authorize(
-            'view',
-            $consultation
-        );
+    public function show(Consultation $consultation)
+    {
+        $this->authorize('view', $consultation);
 
         $consultation->load('service');
 
         return response()->json([
             'success' => true,
-            'data' => new ConsultationResource(
-                $consultation
-            ),
+            'data' => new ConsultationResource($consultation),
         ]);
     }
 
@@ -187,44 +178,30 @@ class ConsultationController extends Controller
         UpdateConsultationRequest $request,
         Consultation $consultation
     ) {
-        $this->authorize(
-            'update',
-            $consultation
-        );
+        $this->authorize('update', $consultation);
 
-        $consultation->update(
-            $request->validated()
-        );
-
+        $consultation->update($request->validated());
         $consultation->load('service');
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Consultation status updated successfully.',
-            'data' => new ConsultationResource(
-                $consultation
-            ),
+            'message' => 'Consultation status updated successfully.',
+            'data' => new ConsultationResource($consultation),
         ]);
     }
 
     /**
      * Remove the specified consultation.
      */
-    public function destroy(
-        Consultation $consultation
-    ) {
-        $this->authorize(
-            'delete',
-            $consultation
-        );
+    public function destroy(Consultation $consultation)
+    {
+        $this->authorize('delete', $consultation);
 
         $consultation->delete();
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Consultation deleted successfully.',
+            'message' => 'Consultation deleted successfully.',
         ]);
     }
 }

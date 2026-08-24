@@ -157,6 +157,11 @@ Route::prefix('admin')
             |--------------------------------------------------------------------------
             */
 
+            Route::get('consultations/export/excel', [ConsultationController::class, 'exportExcel'])
+                ->middleware('role:super_admin,admin,marketing');
+            Route::get('consultations/export/pdf', [ConsultationController::class, 'exportPdf'])
+                ->middleware('role:super_admin,admin,marketing');
+
             Route::apiResource(
                 'consultations',
                 ConsultationController::class

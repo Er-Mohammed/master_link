@@ -48,10 +48,9 @@ class ServiceController extends Controller
         */
 
         $query = Service::query()
+            ->with(['media'])
             ->withCount([
                 'media',
-                'projects',
-                'consultations',
             ]);
 
         /*
