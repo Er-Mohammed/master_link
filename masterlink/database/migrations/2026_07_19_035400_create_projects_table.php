@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('title', 200);
             $table->string('slug', 220)->unique();
             $table->string('client_name', 150)->nullable();
-            $table->text('short_description') ->nullable();
+            $table->text('short_description')->nullable();
             $table->text('full_description')->nullable();
             $table->string('project_url')->nullable();
             $table->date('completion_date')->nullable();

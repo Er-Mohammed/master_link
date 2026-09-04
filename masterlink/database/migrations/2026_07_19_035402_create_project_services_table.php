@@ -21,12 +21,13 @@ return new class extends Migration
 
             $table->primary([
                 'project_id',
-                'service_id'
+                'service_id',
             ]);
 
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */

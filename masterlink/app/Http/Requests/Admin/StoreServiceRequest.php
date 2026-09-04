@@ -28,13 +28,13 @@ class StoreServiceRequest extends FormRequest
             'title' => [
                 'required',
                 'string',
-                'max:255',
+                'max:150',
             ],
 
             'slug' => [
                 'required',
                 'string',
-                'max:255',
+                'max:180',
                 'unique:services,slug',
             ],
 

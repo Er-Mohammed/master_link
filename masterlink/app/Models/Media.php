@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Media extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'admin_id',
@@ -21,15 +20,11 @@ class Media extends Model
         'media_type',
         'mime_type',
         'file_size',
-        'width',
-        'height',
         'alt_text',
     ];
 
     protected $casts = [
         'file_size' => 'integer',
-        'width' => 'integer',
-        'height' => 'integer',
     ];
 
     /**
@@ -73,8 +68,20 @@ class Media extends Model
      */
     public function url(): string
     {
+        if (! $this->file_path) {
+            return '';
+        }
+
+        if (filter_var($this->file_path, FILTER_VALIDATE_URL)) {
+            return $this->file_path;
+        }
+
+        if (str_starts_with($this->file_path, 'storage/')) {
+            return asset($this->file_path);
+        }
+
         return asset(
-            'storage/' . $this->file_path
+            'storage/'.$this->file_path
         );
     }
 }

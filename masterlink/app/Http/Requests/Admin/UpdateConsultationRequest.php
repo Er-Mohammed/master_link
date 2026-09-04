@@ -50,11 +50,9 @@ class UpdateConsultationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'status.required' =>
-                'حالة الاستشارة مطلوبة.',
+            'status.required' => 'حالة الاستشارة مطلوبة.',
 
-            'status.in' =>
-                'حالة الاستشارة غير صالحة.',
+            'status.in' => 'حالة الاستشارة غير صالحة.',
         ];
     }
 }

@@ -47,8 +47,7 @@ class SiteSettingController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Site setting created successfully.',
+            'message' => 'Site setting created successfully.',
             'data' => new SiteSettingResource(
                 $setting
             ),
@@ -94,8 +93,7 @@ class SiteSettingController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Site setting updated successfully.',
+            'message' => 'Site setting updated successfully.',
             'data' => new SiteSettingResource(
                 $siteSetting
             ),
@@ -117,8 +115,7 @@ class SiteSettingController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Site setting deleted successfully.',
+            'message' => 'Site setting deleted successfully.',
         ]);
     }
 }

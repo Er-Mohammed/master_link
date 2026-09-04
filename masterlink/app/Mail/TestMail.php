@@ -18,6 +18,6 @@ class TestMail extends Mailable
     public function build()
     {
         return $this->subject('MasterLink Test Email')
-                    ->text('emails.test');
+            ->text('emails.test');
     }
 }

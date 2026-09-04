@@ -8,7 +8,9 @@ class UpdateTestimonialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $testimonial = $this->route('testimonial');
+
+        return $testimonial && ($this->user()?->can('update', $testimonial) ?? false);
     }
 
     public function rules(): array
@@ -47,20 +49,15 @@ class UpdateTestimonialRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'media_id.exists' =>
-                'Selected media does not exist.',
+            'media_id.exists' => 'Selected media does not exist.',
 
-            'display_name.string' =>
-                'Display name must be a valid string.',
+            'display_name.string' => 'Display name must be a valid string.',
 
-            'message.string' =>
-                'Message must be a valid string.',
+            'message.string' => 'Message must be a valid string.',
 
-            'sort_order.integer' =>
-                'Sort order must be an integer.',
+            'sort_order.integer' => 'Sort order must be an integer.',
 
-            'sort_order.min' =>
-                'Sort order cannot be negative.',
+            'sort_order.min' => 'Sort order cannot be negative.',
         ];
     }
 }

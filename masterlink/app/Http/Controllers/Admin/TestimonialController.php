@@ -19,7 +19,8 @@ class TestimonialController extends Controller
 
         $testimonials = Testimonial::query()
             ->with('media')
-            ->latest()
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'desc')
             ->get();
 
         return TestimonialResource::collection($testimonials);

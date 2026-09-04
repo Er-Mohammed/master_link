@@ -72,29 +72,4 @@ class ProjectCategoryPolicy
                 Admin::ROLE_ADMIN,
             ]);
     }
-
-    /**
-     * Determine whether the admin can restore a category.
-     */
-    public function restore(
-        Admin $admin,
-        ProjectCategory $projectCategory
-    ): bool {
-        return $admin->isActive()
-            && $admin->hasAnyRole([
-                Admin::ROLE_SUPER_ADMIN,
-                Admin::ROLE_ADMIN,
-            ]);
-    }
-
-    /**
-     * Determine whether the admin can permanently delete a category.
-     */
-    public function forceDelete(
-        Admin $admin,
-        ProjectCategory $projectCategory
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
 }

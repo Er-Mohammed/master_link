@@ -77,30 +77,4 @@ class PostPolicy
                 Admin::ROLE_CONTENT_MANAGER,
             ]);
     }
-
-    /**
-     * Restore a deleted post.
-     */
-    public function restore(
-        Admin $admin,
-        Post $post
-    ): bool {
-        return $admin->isActive()
-            && $admin->hasAnyRole([
-                Admin::ROLE_SUPER_ADMIN,
-                Admin::ROLE_ADMIN,
-                Admin::ROLE_CONTENT_MANAGER,
-            ]);
-    }
-
-    /**
-     * Permanently delete a post.
-     */
-    public function forceDelete(
-        Admin $admin,
-        Post $post
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
 }

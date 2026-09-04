@@ -17,7 +17,7 @@ return new class extends Migration
                 ->constrained('media')
                 ->cascadeOnDelete();
 
-            $table->string('company_name',150);
+            $table->string('company_name', 150);
 
             $table->string('website_url')->nullable();
 

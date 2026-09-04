@@ -2,13 +2,17 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\ProjectCategory;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProjectCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can(
+            'create',
+            ProjectCategory::class
+        ) ?? false;
     }
 
     public function rules(): array

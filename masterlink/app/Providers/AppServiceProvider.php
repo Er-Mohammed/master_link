@@ -12,7 +12,6 @@ use App\Models\ProjectCategory;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
-
 use App\Policies\AdminPolicy;
 use App\Policies\ClientLogoPolicy;
 use App\Policies\ConsultationPolicy;
@@ -23,7 +22,6 @@ use App\Policies\ProjectPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\SiteSettingPolicy;
 use App\Policies\TestimonialPolicy;
-
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -65,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(5)
                 ->by(
-                    $email . '|' . $request->ip()
+                    $email.'|'.$request->ip()
                 );
         });
 

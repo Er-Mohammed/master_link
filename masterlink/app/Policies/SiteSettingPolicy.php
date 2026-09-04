@@ -57,26 +57,4 @@ class SiteSettingPolicy
         return $admin->isActive()
             && $admin->isSuperAdmin();
     }
-
-    /**
-     * Restore a deleted site setting.
-     */
-    public function restore(
-        Admin $admin,
-        SiteSetting $siteSetting
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
-
-    /**
-     * Permanently delete a site setting.
-     */
-    public function forceDelete(
-        Admin $admin,
-        SiteSetting $siteSetting
-    ): bool {
-        return $admin->isActive()
-            && $admin->isSuperAdmin();
-    }
 }

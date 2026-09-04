@@ -7,27 +7,49 @@ use App\Http\Requests\Admin\StoreClientLogoRequest;
 use App\Http\Requests\Admin\UpdateClientLogoRequest;
 use App\Http\Resources\Admin\ClientLogoResource;
 use App\Models\ClientLogo;
+use Illuminate\Http\Request;
 
 class ClientLogoController extends Controller
 {
     /**
      * Display a listing of client logos.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->authorize(
-            'viewAny',
-            ClientLogo::class
-        );
+        $this->authorize('viewAny', ClientLogo::class);
 
-        $logos = ClientLogo::query()
-            ->with('media')
-            ->latest()
-            ->get();
+        $query = ClientLogo::query()->with('media');
 
-        return ClientLogoResource::collection(
-            $logos
-        );
+        if ($request->has('search') && ! empty($request->query('search'))) {
+            $search = $request->query('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('company_name', 'like', "%{$search}%")
+                    ->orWhere('website_url', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('is_active') && $request->query('is_active') !== null && $request->query('is_active') !== '') {
+            $isActive = filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN);
+            $query->where('is_active', $isActive);
+        }
+
+        $sort = $request->query('sort', 'sort_order');
+        $direction = strtolower($request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        $allowedSorts = ['id', 'company_name', 'sort_order', 'is_active', 'created_at'];
+        if (in_array($sort, $allowedSorts)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->orderBy('sort_order', 'asc')->orderBy('id', 'asc');
+        }
+
+        if ($request->has('per_page')) {
+            $perPage = (int) $request->query('per_page', 15);
+
+            return ClientLogoResource::collection($query->paginate($perPage));
+        }
+
+        return ClientLogoResource::collection($query->get());
     }
 
     /**
@@ -49,8 +71,7 @@ class ClientLogoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Client logo created successfully.',
+            'message' => 'Client logo created successfully.',
             'data' => new ClientLogoResource($logo),
         ], 201);
     }
@@ -97,8 +118,7 @@ class ClientLogoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Client logo updated successfully.',
+            'message' => 'Client logo updated successfully.',
             'data' => new ClientLogoResource(
                 $clientLogo
             ),
@@ -119,8 +139,7 @@ class ClientLogoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' =>
-                'Client logo deleted successfully.',
+            'message' => 'Client logo deleted successfully.',
         ]);
     }
 }

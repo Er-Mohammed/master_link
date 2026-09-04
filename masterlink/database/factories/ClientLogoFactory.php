@@ -15,16 +15,11 @@ class ClientLogoFactory extends Factory
                 ->inRandomOrder()
                 ->value('id'),
 
-
             'company_name' => fake()->company(),
-
 
             'website_url' => fake()->optional()->url(),
 
-
-            'sort_order' =>
-                fake()->numberBetween(0, 20),
-
+            'sort_order' => fake()->numberBetween(0, 20),
 
             'is_active' => true,
 

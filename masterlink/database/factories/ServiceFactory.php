@@ -26,25 +26,20 @@ class ServiceFactory extends Factory
 
         ];
 
-
         $title = fake()
             ->randomElement($services);
-
 
         return [
 
             'title' => $title,
 
-            'slug' => Str::slug($title) . '-' . fake()->numberBetween(1,9999),
+            'slug' => Str::slug($title).'-'.fake()->numberBetween(1, 9999),
 
-            'short_description' =>
-                fake()->sentence(),
+            'short_description' => fake()->sentence(),
 
-            'full_description' =>
-                fake()->paragraphs(3, true),
+            'full_description' => fake()->paragraphs(3, true),
 
-            'sort_order' =>
-                fake()->numberBetween(0,10),
+            'sort_order' => fake()->numberBetween(0, 10),
 
             'is_active' => true,
 

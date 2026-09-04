@@ -26,24 +26,18 @@ class ProjectCategoryFactory extends Factory
 
         ];
 
-
         $name = fake()
             ->randomElement($categories);
-
 
         return [
 
             'name' => $name,
 
-
-            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(1000, 9999),
-
+            'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1000, 9999),
 
             'description' => fake()->paragraph(),
 
-
             'sort_order' => fake()->numberBetween(0, 10),
-
 
             'is_active' => true,
 

@@ -26,11 +26,9 @@ class ConsultationResource extends JsonResource
                 $this->whenLoaded('service')
             ),
 
-            'created_at' =>
-                $this->created_at?->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
 
-            'updated_at' =>
-                $this->updated_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

@@ -62,10 +62,7 @@ class UpdateAdminRequest extends FormRequest
                     Admin::ROLE_CONTENT_MANAGER,
                     Admin::ROLE_MARKETING,
                 ]),
-                Rule::when(
-                    $isSelfUpdate,
-                    Rule::prohibited()
-                ),
+                Rule::prohibitedIf($isSelfUpdate),
             ],
 
             /*
@@ -79,11 +76,8 @@ class UpdateAdminRequest extends FormRequest
             'is_active' => [
                 'sometimes',
                 'boolean',
-                Rule::when(
-                    $isSelfUpdate,
-                    Rule::prohibitedIf(
-                        $currentAdmin?->isSuperAdmin()
-                    )
+                Rule::prohibitedIf(
+                    $isSelfUpdate && $currentAdmin?->isSuperAdmin()
                 ),
             ],
         ];

@@ -2,63 +2,56 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\Admin;
+use App\Models\Testimonial;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
-class UpdateAdminRequest extends FormRequest
+class StoreTestimonialRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Testimonial::class) ?? false;
     }
 
     public function rules(): array
     {
-        $targetAdmin = $this->route('admin');
-
         return [
-            'name' => [
-                'sometimes',
-                'string',
-                'max:150',
-            ],
-
-            'email' => [
-                'sometimes',
-                'email',
-                'max:150',
-
-                Rule::unique(
-                    'admins',
-                    'email'
-                )->ignore(
-                    $targetAdmin?->id
-                ),
-            ],
-
-            'password' => [
-                'sometimes',
+            'media_id' => [
                 'nullable',
-                'string',
-                Password::defaults(),
+                'exists:media,id',
             ],
 
-            'role' => [
-                'sometimes',
-                Rule::in([
-                    Admin::ROLE_SUPER_ADMIN,
-                    Admin::ROLE_ADMIN,
-                    Admin::ROLE_CONTENT_MANAGER,
-                    Admin::ROLE_MARKETING,
-                ]),
+            'display_name' => [
+                'required',
+                'string',
+                'max:150',
+            ],
+
+            'message' => [
+                'required',
+                'string',
+            ],
+
+            'sort_order' => [
+                'nullable',
+                'integer',
+                'min:0',
             ],
 
             'is_active' => [
-                'sometimes',
+                'nullable',
                 'boolean',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'media_id.exists' => 'Selected media does not exist.',
+            'display_name.required' => 'Display name is required.',
+            'message.required' => 'Message is required.',
+            'sort_order.integer' => 'Sort order must be an integer.',
+            'sort_order.min' => 'Sort order cannot be negative.',
         ];
     }
 }

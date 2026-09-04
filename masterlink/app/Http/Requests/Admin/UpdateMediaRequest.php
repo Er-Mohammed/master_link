@@ -43,11 +43,9 @@ class UpdateMediaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'alt_text.string' =>
-                'النص البديل يجب أن يكون نصاً.',
+            'alt_text.string' => 'النص البديل يجب أن يكون نصاً.',
 
-            'alt_text.max' =>
-                'النص البديل يجب ألا يتجاوز 255 حرفاً.',
+            'alt_text.max' => 'النص البديل يجب ألا يتجاوز 255 حرفاً.',
         ];
     }
 }

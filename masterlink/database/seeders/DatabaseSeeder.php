@@ -2,27 +2,23 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-
 use App\Models\Admin;
-use App\Models\Media;
-use App\Models\Service;
-use App\Models\ProjectCategory;
-use App\Models\Project;
-use App\Models\Post;
-use App\Models\Consultation;
 use App\Models\ClientLogo;
-use App\Models\SiteSetting;
+use App\Models\Consultation;
+use App\Models\Media;
+use App\Models\Post;
+use App\Models\Project;
+use App\Models\ProjectCategory;
 use App\Models\ProjectMedia;
+use App\Models\Service;
+use App\Models\SiteSetting;
 use App\Models\Testimonial;
-
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-
     public function run(): void
     {
-
 
         /*
         |--------------------------------------------------------------------------
@@ -32,8 +28,6 @@ class DatabaseSeeder extends Seeder
 
         Admin::factory(3)->create();
 
-
-
         /*
         |--------------------------------------------------------------------------
         | Media
@@ -41,8 +35,6 @@ class DatabaseSeeder extends Seeder
         */
 
         Media::factory(30)->create();
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -52,8 +44,6 @@ class DatabaseSeeder extends Seeder
 
         Service::factory(6)->create();
 
-
-
         /*
         |--------------------------------------------------------------------------
         | Service Media
@@ -62,26 +52,21 @@ class DatabaseSeeder extends Seeder
 
         Service::all()->each(function ($service) {
 
-
             $mediaIds = Media::inRandomOrder()
                 ->limit(3)
                 ->pluck('id');
 
-
             foreach ($mediaIds as $mediaId) {
-
 
                 $service->media()->attach($mediaId, [
 
-                    'sort_order' => fake()->numberBetween(0,10)
+                    'sort_order' => fake()->numberBetween(0, 10),
 
                 ]);
 
             }
 
         });
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -91,8 +76,6 @@ class DatabaseSeeder extends Seeder
 
         SiteSetting::factory(10)->create();
 
-
-
         /*
         |--------------------------------------------------------------------------
         | Project Categories
@@ -100,8 +83,6 @@ class DatabaseSeeder extends Seeder
         */
 
         ProjectCategory::factory(5)->create();
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -111,42 +92,33 @@ class DatabaseSeeder extends Seeder
 
         Project::factory(15)->create();
 
-
-
         /*
         |--------------------------------------------------------------------------
         | Project Media
         |--------------------------------------------------------------------------
         */
 
-
         Project::all()->each(function ($project) {
-
 
             $mediaIds = Media::inRandomOrder()
                 ->limit(4)
                 ->pluck('id');
 
-
             foreach ($mediaIds as $mediaId) {
-
 
                 ProjectMedia::create([
 
-                    'project_id'=>$project->id,
+                    'project_id' => $project->id,
 
-                    'media_id'=>$mediaId,
+                    'media_id' => $mediaId,
 
-                    'sort_order'=>fake()->numberBetween(0,10)
+                    'sort_order' => fake()->numberBetween(0, 10),
 
                 ]);
 
             }
 
-
         });
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -154,22 +126,16 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-
         Project::all()->each(function ($project) {
-
 
             $serviceIds = Service::inRandomOrder()
                 ->limit(3)
                 ->pluck('id');
 
-
             $project->services()
                 ->attach($serviceIds);
 
-
         });
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -177,22 +143,18 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-
         Media::inRandomOrder()
             ->limit(8)
             ->get()
             ->each(function ($media) {
 
-
                 ClientLogo::factory()->create([
 
-                    'media_id'=>$media->id
+                    'media_id' => $media->id,
 
                 ]);
 
             });
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -200,22 +162,18 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-
         Media::inRandomOrder()
             ->limit(6)
             ->get()
             ->each(function ($media) {
 
-
                 Testimonial::factory()->create([
 
-                    'media_id'=>$media->id
+                    'media_id' => $media->id,
 
                 ]);
 
             });
-
-
 
         /*
         |--------------------------------------------------------------------------
@@ -225,8 +183,6 @@ class DatabaseSeeder extends Seeder
 
         Post::factory(10)->create();
 
-
-
         /*
         |--------------------------------------------------------------------------
         | Consultations
@@ -234,7 +190,6 @@ class DatabaseSeeder extends Seeder
         */
 
         Consultation::factory(20)->create();
-
 
     }
 }

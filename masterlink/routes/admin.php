@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientLogoController;
 use App\Http\Controllers\Admin\ConsultationController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
@@ -46,6 +47,15 @@ Route::prefix('admin')
             Route::get('me', [AuthController::class, 'me'])
                 ->name('me');
 
+            Route::get('dashboard/stats', [DashboardController::class, 'stats'])
+                ->name('dashboard.stats');
+
+            Route::match(['put', 'patch', 'post'], 'me', [AuthController::class, 'updateProfile'])
+                ->name('me.update');
+
+            Route::match(['put', 'patch', 'post'], 'profile', [AuthController::class, 'updateProfile'])
+                ->name('profile.update');
+
             Route::post('logout', [AuthController::class, 'logout'])
                 ->name('logout');
 
@@ -85,6 +95,14 @@ Route::prefix('admin')
 
             Route::apiResource('projects', ProjectController::class)
                 ->middleware('role:super_admin,admin,marketing');
+
+            Route::put('projects/{project}/media', [ProjectController::class, 'syncMedia'])
+                ->middleware('role:super_admin,admin,marketing')
+                ->name('projects.media.sync');
+
+            Route::put('projects/{project}/services', [ProjectController::class, 'syncServices'])
+                ->middleware('role:super_admin,admin,marketing')
+                ->name('projects.services.sync');
 
             /*
             |--------------------------------------------------------------------------
@@ -142,6 +160,11 @@ Route::prefix('admin')
             | Consultations
             |--------------------------------------------------------------------------
             */
+
+            Route::get('consultations/export/excel', [ConsultationController::class, 'exportExcel'])
+                ->middleware('role:super_admin,admin,marketing');
+            Route::get('consultations/export/pdf', [ConsultationController::class, 'exportPdf'])
+                ->middleware('role:super_admin,admin,marketing');
 
             Route::apiResource(
                 'consultations',

@@ -2,14 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Service;
 use App\Models\Media;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
 
 class ServiceMediaFactory extends Factory
 {
-
     public function definition(): array
     {
 
@@ -20,10 +18,9 @@ class ServiceMediaFactory extends Factory
             'media_id' => Media::factory(),
 
             'sort_order' => fake()
-                ->numberBetween(0,10),
+                ->numberBetween(0, 10),
 
         ];
 
     }
-
 }
