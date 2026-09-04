@@ -15,7 +15,6 @@ class ProjectMedia extends Model
         'sort_order',
     ];
 
-
     /**
      * المشروع المرتبط بالصورة
      */
@@ -23,7 +22,6 @@ class ProjectMedia extends Model
     {
         return $this->belongsTo(Project::class);
     }
-
 
     /**
      * الصورة المرتبطة بالمشروع

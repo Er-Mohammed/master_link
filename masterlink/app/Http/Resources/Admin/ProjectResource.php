@@ -26,8 +26,7 @@ class ProjectResource extends JsonResource
 
             'project_url' => $this->project_url,
 
-            'completion_date' =>
-                $this->completion_date?->toDateString(),
+            'completion_date' => $this->completion_date?->toDateString(),
 
             'is_featured' => (bool) $this->is_featured,
             'sort_order' => $this->sort_order,
@@ -73,11 +72,9 @@ class ProjectResource extends JsonResource
             |--------------------------------------------------------------------------
             */
 
-            'created_at' =>
-                $this->created_at?->toISOString(),
+            'created_at' => $this->created_at?->toISOString(),
 
-            'updated_at' =>
-                $this->updated_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

@@ -17,13 +17,12 @@ return new class extends Migration
             */
 
             $table->dropForeign([
-                'project_id'
+                'project_id',
             ]);
 
             $table->dropForeign([
-                'service_id'
+                'service_id',
             ]);
-
 
             /*
             |--------------------------------------------------------------------------
@@ -55,13 +54,12 @@ return new class extends Migration
             */
 
             $table->dropForeign([
-                'project_id'
+                'project_id',
             ]);
 
             $table->dropForeign([
-                'service_id'
+                'service_id',
             ]);
-
 
             /*
             |--------------------------------------------------------------------------

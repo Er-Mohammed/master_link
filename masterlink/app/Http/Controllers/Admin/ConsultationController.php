@@ -128,11 +128,11 @@ class ConsultationController extends Controller
         $query = $this->buildFilteredQuery($request);
         $binary = ConsultationsExcelExport::generate($query);
 
-        $fileName = 'masterlink-consultations-' . now()->format('Y-m-d') . '.xlsx';
+        $fileName = 'masterlink-consultations-'.now()->format('Y-m-d').'.xlsx';
 
         return response($binary, 200, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
             'Cache-Control' => 'max-age=0',
         ]);
     }
@@ -147,11 +147,11 @@ class ConsultationController extends Controller
         $query = $this->buildFilteredQuery($request);
         $binary = ConsultationsPdfExport::generate($query, $request);
 
-        $fileName = 'masterlink-consultations-' . now()->format('Y-m-d') . '.pdf';
+        $fileName = 'masterlink-consultations-'.now()->format('Y-m-d').'.pdf';
 
         return response($binary, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
             'Cache-Control' => 'max-age=0',
         ]);
     }

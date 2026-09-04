@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\Testimonial;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTestimonialRequest extends FormRequest
@@ -10,6 +9,7 @@ class UpdateTestimonialRequest extends FormRequest
     public function authorize(): bool
     {
         $testimonial = $this->route('testimonial');
+
         return $testimonial && ($this->user()?->can('update', $testimonial) ?? false);
     }
 
@@ -49,20 +49,15 @@ class UpdateTestimonialRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'media_id.exists' =>
-                'Selected media does not exist.',
+            'media_id.exists' => 'Selected media does not exist.',
 
-            'display_name.string' =>
-                'Display name must be a valid string.',
+            'display_name.string' => 'Display name must be a valid string.',
 
-            'message.string' =>
-                'Message must be a valid string.',
+            'message.string' => 'Message must be a valid string.',
 
-            'sort_order.integer' =>
-                'Sort order must be an integer.',
+            'sort_order.integer' => 'Sort order must be an integer.',
 
-            'sort_order.min' =>
-                'Sort order cannot be negative.',
+            'sort_order.min' => 'Sort order cannot be negative.',
         ];
     }
 }

@@ -70,20 +70,15 @@ class UpdateClientLogoRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'media_id.exists' =>
-                'Selected media does not exist.',
+            'media_id.exists' => 'Selected media does not exist.',
 
-            'media_id.unique' =>
-                'This media is already assigned to another client logo.',
+            'media_id.unique' => 'This media is already assigned to another client logo.',
 
-            'website_url.url' =>
-                'Website URL must be a valid URL.',
+            'website_url.url' => 'Website URL must be a valid URL.',
 
-            'sort_order.integer' =>
-                'Sort order must be an integer.',
+            'sort_order.integer' => 'Sort order must be an integer.',
 
-            'sort_order.min' =>
-                'Sort order cannot be negative.',
+            'sort_order.min' => 'Sort order cannot be negative.',
         ];
     }
 }

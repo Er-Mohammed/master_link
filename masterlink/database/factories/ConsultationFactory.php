@@ -29,7 +29,7 @@ class ConsultationFactory extends Factory
             'status' => fake()->randomElement([
                 'new',
                 'pending',
-                'completed'
+                'completed',
             ]),
 
         ];

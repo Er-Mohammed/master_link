@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Website;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreConsultationRequest;
 use App\Models\Consultation;
+use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 
 class ConsultationController extends Controller
@@ -16,7 +17,7 @@ class ConsultationController extends Controller
     {
         $data = $request->validated();
 
-        if (empty($data['service_id']) && !empty($data['services'])) {
+        if (empty($data['service_id']) && ! empty($data['services'])) {
             $data['service_id'] = $this->resolveServiceId($data['services']);
         }
 
@@ -56,7 +57,7 @@ class ConsultationController extends Controller
         }
 
         // Try exact match first
-        $exactService = \App\Models\Service::where('title', $firstService)->first();
+        $exactService = Service::where('title', $firstService)->first();
         if ($exactService) {
             return $exactService->id;
         }
@@ -91,7 +92,7 @@ class ConsultationController extends Controller
         // If the service string is in our map, search database using associated keywords
         if (isset($map[$firstService])) {
             foreach ($map[$firstService] as $keyword) {
-                $service = \App\Models\Service::where('title', 'like', "%{$keyword}%")->first();
+                $service = Service::where('title', 'like', "%{$keyword}%")->first();
                 if ($service) {
                     return $service->id;
                 }
@@ -99,7 +100,7 @@ class ConsultationController extends Controller
         }
 
         // Fuzzy match using the raw string
-        $service = \App\Models\Service::where('title', 'like', "%{$firstService}%")->first();
+        $service = Service::where('title', 'like', "%{$firstService}%")->first();
         if ($service) {
             return $service->id;
         }
@@ -108,7 +109,7 @@ class ConsultationController extends Controller
         $words = explode(' ', $firstService);
         foreach ($words as $word) {
             if (strlen($word) > 3) {
-                $service = \App\Models\Service::where('title', 'like', "%{$word}%")->first();
+                $service = Service::where('title', 'like', "%{$word}%")->first();
                 if ($service) {
                     return $service->id;
                 }

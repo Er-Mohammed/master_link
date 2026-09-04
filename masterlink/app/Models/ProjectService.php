@@ -14,7 +14,6 @@ class ProjectService extends Model
         'service_id',
     ];
 
-
     /**
      * المشروع المرتبط
      */
@@ -22,7 +21,6 @@ class ProjectService extends Model
     {
         return $this->belongsTo(Project::class);
     }
-
 
     /**
      * الخدمة المرتبطة

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\ProjectCategory;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProjectCategoryRequest extends FormRequest
 {

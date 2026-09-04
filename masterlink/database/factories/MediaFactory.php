@@ -13,7 +13,7 @@ class MediaFactory extends Factory
             'jpg',
             'png',
             'webp',
-            'mp4'
+            'mp4',
         ]);
 
         $mediaType = match ($extension) {
@@ -24,25 +24,19 @@ class MediaFactory extends Factory
 
         };
 
-
         return [
 
             'admin_id' => Admin::query()
                 ->inRandomOrder()
                 ->value('id'),
 
+            'file_name' => fake()->word().'.'.$extension,
 
-            'file_name' => fake()->word() . '.' . $extension,
-
-
-            'file_path' => 'media/' . fake()->uuid() . '.' . $extension,
-
+            'file_path' => 'media/'.fake()->uuid().'.'.$extension,
 
             'extension' => $extension,
 
-
             'media_type' => $mediaType,
-
 
             'mime_type' => match ($extension) {
 
@@ -56,18 +50,8 @@ class MediaFactory extends Factory
 
             },
 
-
             'file_size' => fake()
                 ->numberBetween(10000, 5000000),
-
-
-            'width' => fake()
-                ->randomElement([800, 1024, 1920]),
-
-
-            'height' => fake()
-                ->randomElement([600, 720, 1080]),
-
 
             'alt_text' => fake()->sentence(),
 

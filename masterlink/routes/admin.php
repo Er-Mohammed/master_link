@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientLogoController;
 use App\Http\Controllers\Admin\ConsultationController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
@@ -45,6 +46,9 @@ Route::prefix('admin')
 
             Route::get('me', [AuthController::class, 'me'])
                 ->name('me');
+
+            Route::get('dashboard/stats', [DashboardController::class, 'stats'])
+                ->name('dashboard.stats');
 
             Route::match(['put', 'patch', 'post'], 'me', [AuthController::class, 'updateProfile'])
                 ->name('me.update');

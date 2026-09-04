@@ -34,7 +34,7 @@ return new class extends Migration
             $table->enum('media_type', [
                 'image',
                 'video',
-                'document'
+                'document',
             ]);
 
             // MIME Type

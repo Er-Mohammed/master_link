@@ -308,8 +308,7 @@ class ServiceController extends Controller
 
         $service->media()->syncWithoutDetaching([
             $validated['media_id'] => [
-                'sort_order' =>
-                    $validated['sort_order'] ?? 0,
+                'sort_order' => $validated['sort_order'] ?? 0,
             ],
         ]);
 

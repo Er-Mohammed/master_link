@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::table('service_media', function (Blueprint $table) {
@@ -18,13 +17,12 @@ return new class extends Migration
             */
 
             $table->dropForeign([
-                'service_id'
+                'service_id',
             ]);
 
             $table->dropForeign([
-                'media_id'
+                'media_id',
             ]);
-
 
             /*
             |--------------------------------------------------------------------------
@@ -37,12 +35,10 @@ return new class extends Migration
                 ->on('services')
                 ->cascadeOnDelete();
 
-
             $table->foreign('media_id')
                 ->references('id')
                 ->on('media')
                 ->cascadeOnDelete();
-
 
             /*
             |--------------------------------------------------------------------------
@@ -50,14 +46,13 @@ return new class extends Migration
             |--------------------------------------------------------------------------
             */
 
-          //  $table->unique([
+            //  $table->unique([
             //    'service_id',
-              //  'media_id'
-            //]);
+            //  'media_id'
+            // ]);
 
         });
     }
-
 
     public function down(): void
     {
@@ -71,9 +66,8 @@ return new class extends Migration
 
             $table->dropUnique([
                 'service_id',
-                'media_id'
+                'media_id',
             ]);
-
 
             /*
             |--------------------------------------------------------------------------
@@ -82,13 +76,12 @@ return new class extends Migration
             */
 
             $table->dropForeign([
-                'service_id'
+                'service_id',
             ]);
 
             $table->dropForeign([
-                'media_id'
+                'media_id',
             ]);
-
 
             /*
             |--------------------------------------------------------------------------
@@ -99,7 +92,6 @@ return new class extends Migration
             $table->foreign('service_id')
                 ->references('id')
                 ->on('services');
-
 
             $table->foreign('media_id')
                 ->references('id')

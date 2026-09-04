@@ -20,13 +20,13 @@ class AdminAuthController extends Controller
 
         $admin = Admin::where('email', $fields['email'])->first();
 
-        if (!$admin || !Hash::check($fields['password'], $admin->password)) {
+        if (! $admin || ! Hash::check($fields['password'], $admin->password)) {
             throw ValidationException::withMessages([
                 'email' => ['بيانات الدخول غير صحيحة.'],
             ]);
         }
 
-        if (!$admin->is_active) {
+        if (! $admin->is_active) {
             return response()->json([
                 'message' => 'هذا الحساب معطل حالياً، يرجى التواصل مع الإدارة.',
             ], 403);

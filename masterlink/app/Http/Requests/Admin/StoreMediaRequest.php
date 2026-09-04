@@ -98,23 +98,17 @@ class StoreMediaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'file.required' =>
-                'الملف مطلوب.',
+            'file.required' => 'الملف مطلوب.',
 
-            'file.file' =>
-                'الملف المرفق غير صالح.',
+            'file.file' => 'الملف المرفق غير صالح.',
 
-            'file.max' =>
-                'حجم الملف يجب ألا يتجاوز 10 ميجابايت.',
+            'file.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت.',
 
-            'file.types' =>
-                'نوع الملف غير مسموح به.',
+            'file.types' => 'نوع الملف غير مسموح به.',
 
-            'alt_text.string' =>
-                'النص البديل يجب أن يكون نصاً.',
+            'alt_text.string' => 'النص البديل يجب أن يكون نصاً.',
 
-            'alt_text.max' =>
-                'النص البديل يجب ألا يتجاوز 255 حرفاً.',
+            'alt_text.max' => 'النص البديل يجب ألا يتجاوز 255 حرفاً.',
         ];
     }
 }

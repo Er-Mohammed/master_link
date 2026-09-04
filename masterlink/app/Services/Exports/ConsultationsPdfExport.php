@@ -74,8 +74,9 @@ class ConsultationsPdfExport
 
         for ($i = 0; $i < $count; $i++) {
             $char = $chars[$i];
-            if (!isset($glyphs[$char])) {
+            if (! isset($glyphs[$char])) {
                 $reshapedChars[] = $char;
+
                 continue;
             }
 
@@ -122,21 +123,21 @@ class ConsultationsPdfExport
         // Applied filters summary
         $filters = [];
         if ($request->filled('search')) {
-            $filters[] = 'البحث: ' . $request->input('search');
+            $filters[] = 'البحث: '.$request->input('search');
         }
         if ($request->filled('status')) {
             $st = $request->input('status');
-            $filters[] = 'الحالة: ' . (static::$statusMap[$st] ?? $st);
+            $filters[] = 'الحالة: '.(static::$statusMap[$st] ?? $st);
         }
         if ($request->filled('service_id')) {
-            $filters[] = 'رقم الخدمة: ' . $request->input('service_id');
+            $filters[] = 'رقم الخدمة: '.$request->input('service_id');
         }
         if ($request->filled('sort')) {
             $sort = $request->input('sort') === 'created_at' ? 'التاريخ' : $request->input('sort');
             $dir = $request->input('direction') === 'asc' ? 'تصاعدي' : 'تنازلي';
-            $filters[] = 'الترتيب: ' . $sort . ' (' . $dir . ')';
+            $filters[] = 'الترتيب: '.$sort.' ('.$dir.')';
         }
-        $filtersText = !empty($filters) ? implode(' | ', $filters) : 'جميع الاستشارات';
+        $filtersText = ! empty($filters) ? implode(' | ', $filters) : 'جميع الاستشارات';
 
         // Page Layout Specs (A4 Portrait)
         $pageWidth = 595.28;
@@ -194,7 +195,7 @@ class ConsultationsPdfExport
             $textY -= 18;
             $stream .= "BT /F1 9 Tf 0.200 0.254 0.333 rg\n";
             $statsStr = sprintf(
-                "Total: %d | New: %d | Contacted: %d | In Progress: %d | Completed: %d | Cancelled: %d",
+                'Total: %d | New: %d | Contacted: %d | In Progress: %d | Completed: %d | Cancelled: %d',
                 $stats['total'],
                 $stats['new'],
                 $stats['contacted'],
@@ -232,8 +233,8 @@ class ConsultationsPdfExport
             $currentLine = '';
 
             foreach ($words as $word) {
-                if (mb_strlen($currentLine . ' ' . $word) <= $maxCharsPerLine) {
-                    $currentLine .= ($currentLine === '' ? '' : ' ') . $word;
+                if (mb_strlen($currentLine.' '.$word) <= $maxCharsPerLine) {
+                    $currentLine .= ($currentLine === '' ? '' : ' ').$word;
                 } else {
                     if ($currentLine !== '') {
                         $lines[] = $currentLine;
@@ -244,6 +245,7 @@ class ConsultationsPdfExport
             if ($currentLine !== '') {
                 $lines[] = $currentLine;
             }
+
             return $lines;
         };
 
@@ -257,9 +259,9 @@ class ConsultationsPdfExport
         foreach ($consultations as $item) {
             $recordIndex++;
 
-            $serviceName = $item->service?->title_ar 
-                ?? $item->service?->title_en 
-                ?? $item->service?->name 
+            $serviceName = $item->service?->title_ar
+                ?? $item->service?->title_en
+                ?? $item->service?->name
                 ?? 'General Inquiry';
             $statusText = static::$statusMap[$item->status] ?? $item->status;
             $createdAtStr = $item->created_at ? $item->created_at->format('Y-m-d H:i') : '';
@@ -293,11 +295,11 @@ class ConsultationsPdfExport
             // Card Header Text
             $headerTextY = $currentY - 15;
             $currentPageStream .= "BT /F1 9 Tf 1.000 1.000 1.000 rg\n";
-            $cardTitle = sprintf("Case #%d | Client: %s", $item->id, preg_replace('/[^\x20-\x7E]/', '?', mb_substr($item->name ?? '', 0, 30)));
+            $cardTitle = sprintf('Case #%d | Client: %s', $item->id, preg_replace('/[^\x20-\x7E]/', '?', mb_substr($item->name ?? '', 0, 30)));
             $currentPageStream .= sprintf("1 0 0 1 %.2f %.2f Tm (%s) Tj ET\n", $margin + 10, $headerTextY, addcslashes($cardTitle, "()\n\r\t"));
 
             // Status Badge Text (Right aligned in Header)
-            $statusBadge = sprintf("Status: %s", strtoupper($item->status));
+            $statusBadge = sprintf('Status: %s', strtoupper($item->status));
             $currentPageStream .= "BT /F1 8 Tf 0.949 0.020 0.188 rg\n";
             $currentPageStream .= sprintf("1 0 0 1 %.2f %.2f Tm (%s) Tj ET\n", $margin + 410, $headerTextY, $statusBadge);
 
@@ -306,7 +308,7 @@ class ConsultationsPdfExport
             $currentPageStream .= "BT /F1 8 Tf 0.392 0.455 0.545 rg\n";
 
             $row1 = sprintf(
-                "Email: %s  |  Phone: %s",
+                'Email: %s  |  Phone: %s',
                 preg_replace('/[^\x20-\x7E]/', '?', mb_substr($item->email ?? '-', 0, 35)),
                 preg_replace('/[^\x20-\x7E]/', '?', mb_substr($item->phone ?? '-', 0, 20))
             );
@@ -314,7 +316,7 @@ class ConsultationsPdfExport
 
             $gridY -= 14;
             $row2 = sprintf(
-                "Company: %s  |  Service: %s  |  Date: %s",
+                'Company: %s  |  Service: %s  |  Date: %s',
                 preg_replace('/[^\x20-\x7E]/', '?', mb_substr($item->company_name ?? 'Individual', 0, 22)),
                 preg_replace('/[^\x20-\x7E]/', '?', mb_substr($serviceName, 0, 25)),
                 $createdAtStr
@@ -356,11 +358,11 @@ class ConsultationsPdfExport
         $totalPages = count($pages);
         $pageObjIds = [];
         for ($p = 0; $p < $totalPages; $p++) {
-            $pageObjIds[] = ($p * 2 + 4) . " 0 R";
+            $pageObjIds[] = ($p * 2 + 4).' 0 R';
         }
 
         // 2 0 obj: Pages Tree
-        $objects[2] = "2 0 obj\n<< /Type /Pages /Kids [" . implode(" ", $pageObjIds) . "] /Count " . $totalPages . " >>\nendobj\n";
+        $objects[2] = "2 0 obj\n<< /Type /Pages /Kids [".implode(' ', $pageObjIds).'] /Count '.$totalPages." >>\nendobj\n";
 
         // 3 0 obj: Font Helvetica
         $objects[3] = "3 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n";
@@ -372,7 +374,7 @@ class ConsultationsPdfExport
 
             // Footer (Repeated on every page bottom)
             $footerStream = $pages[$p];
-            $footerText = sprintf("MasterLink - Consultations Report  |  Page %d of %d  |  Confidential", $p + 1, $totalPages);
+            $footerText = sprintf('MasterLink - Consultations Report  |  Page %d of %d  |  Confidential', $p + 1, $totalPages);
 
             $footerStream .= "0.886 0.910 0.941 RG 0.5 w\n";
             $footerStream .= sprintf("%.2f 30 m %.2f 30 l S\n", $margin, $margin + $usableWidth);

@@ -12,34 +12,28 @@ return new class extends Migration
 
             $table->id();
 
-
             $table->foreignId('service_id')
                 ->constrained('services')
                 ->cascadeOnDelete();
-
 
             $table->foreignId('media_id')
                 ->constrained('media')
                 ->cascadeOnDelete();
 
-
             // منع تكرار نفس الملف لنفس الخدمة
             $table->unique([
                 'service_id',
-                'media_id'
+                'media_id',
             ]);
-
 
             // ترتيب الصور
             $table->integer('sort_order')
                 ->default(0);
 
-
             $table->timestamps();
 
         });
     }
-
 
     public function down(): void
     {

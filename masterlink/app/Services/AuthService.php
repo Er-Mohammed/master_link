@@ -87,8 +87,7 @@ class AuthService
             )
         ) {
             throw ValidationException::withMessages([
-                'current_password' =>
-                    'كلمة المرور الحالية غير صحيحة.',
+                'current_password' => 'كلمة المرور الحالية غير صحيحة.',
             ]);
         }
 
